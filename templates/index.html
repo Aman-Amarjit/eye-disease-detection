@@ -3,30 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EyeCheck AI — Easy Eye Health & Cataract Checker</title>
+    <title>EyeCheck — Simple Eye Health & Cataract Checker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
         :root {
-            --bg-page: #f8fafc;
-            --surface: #ffffff;
-            --border: #e2e8f0;
-            --text-dark: #0f172a;
-            --text-secondary: #475569;
-            --text-muted: #64748b;
-            --brand-blue: #2563eb;
-            --brand-blue-hover: #1d4ed8;
-            --success-bg: #f0fdf4;
-            --success-border: #bbf7d0;
-            --success-text: #15803d;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success-bg: #ecfdf5;
+            --success-border: #a7f3d0;
+            --success-text: #065f46;
             --danger-bg: #fef2f2;
             --danger-border: #fecaca;
-            --danger-text: #b91c1c;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08);
+            --danger-text: #991b1b;
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
         }
 
         * {
@@ -37,210 +35,127 @@
 
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-page);
-            color: var(--text-dark);
+            background-color: var(--bg-color);
+            color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            line-height: 1.6;
+            align-items: center;
         }
 
-        /* Top Header */
+        /* Top Header Navigation */
         header {
-            background-color: var(--surface);
+            width: 100%;
+            background: #ffffff;
             border-bottom: 1px solid var(--border);
             padding: 1rem 2rem;
-            box-shadow: var(--shadow);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        .header-wrap {
-            max-width: 1200px;
+        .header-container {
+            max-width: 1000px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .logo-box {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #2563eb, #0284c7);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 1.4rem;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-        }
-
-        .logo-text h1 {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--text-dark);
-            letter-spacing: -0.3px;
-        }
-
-        .logo-text p {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-        }
-
-        .accuracy-badge {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            color: #1e40af;
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Simple 3-Step Guide Bar */
-        .step-bar {
-            max-width: 1200px;
-            margin: 1.5rem auto 0 auto;
-            padding: 0 2rem;
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .step-bar {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .step-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            box-shadow: var(--shadow);
-        }
-
-        .step-num {
-            width: 36px;
-            height: 36px;
-            background: #eff6ff;
-            color: var(--brand-blue);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 1rem;
-            flex-shrink: 0;
-        }
-
-        .step-info h4 {
-            font-size: 0.9rem;
-            font-weight: 700;
-        }
-
-        .step-info p {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-        }
-
-        /* Main Workspace Container */
-        .main-workspace {
-            max-width: 1200px;
-            margin: 1.5rem auto 3rem auto;
-            padding: 0 2rem;
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 900px) {
-            .main-workspace {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card-header {
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .card-title {
-            font-size: 1.05rem;
-            font-weight: 700;
+        .brand-logo {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: var(--text-dark);
+            text-decoration: none;
+            color: var(--text-main);
         }
 
-        .card-title i {
-            color: var(--brand-blue);
+        .brand-logo i {
+            font-size: 1.5rem;
+            color: var(--primary);
         }
 
-        /* Input Method Tabs */
-        .tab-group {
-            display: flex;
-            background: #f1f5f9;
-            padding: 4px;
-            border-radius: 10px;
-            margin-bottom: 1.25rem;
+        .brand-logo h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .badge-accuracy {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        /* Main Container */
+        .app-container {
+            max-width: 680px;
+            width: 100%;
+            margin: 2.5rem 1rem;
+        }
+
+        .title-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .title-section h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        .title-section p {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            margin-top: 6px;
+        }
+
+        /* Simple Card */
+        .main-card {
+            background: var(--card-bg);
             border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
-        .tab-btn {
-            flex: 1;
-            padding: 9px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            font-weight: 600;
-            border-radius: 8px;
+        /* Option Buttons */
+        .input-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .opt-btn {
+            padding: 14px;
+            border: 2px solid var(--border);
+            background: #f8fafc;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-sub);
             cursor: pointer;
-            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: all 0.2s ease;
         }
 
-        .tab-btn.active {
-            background: #fff;
-            color: var(--brand-blue);
-            box-shadow: var(--shadow);
+        .opt-btn:hover, .opt-btn.active {
+            border-color: var(--primary);
+            background: #eff6ff;
+            color: var(--primary);
         }
 
         /* Upload Dropzone */
-        .dropzone {
+        .upload-area {
             border: 2px dashed #cbd5e1;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 2.5rem 1.5rem;
             text-align: center;
             background: #f8fafc;
@@ -248,35 +163,51 @@
             transition: all 0.2s ease;
         }
 
-        .dropzone:hover {
-            border-color: var(--brand-blue);
+        .upload-area:hover {
+            border-color: var(--primary);
             background: #eff6ff;
         }
 
-        .dropzone i {
+        .upload-area i {
             font-size: 2.5rem;
-            color: var(--brand-blue);
+            color: var(--primary);
             margin-bottom: 0.75rem;
         }
 
-        .dropzone-text {
-            font-size: 0.95rem;
+        .upload-area h4 {
+            font-size: 1rem;
             font-weight: 700;
-            color: var(--text-dark);
         }
 
-        .dropzone-subtext {
-            font-size: 0.8rem;
+        .upload-area p {
+            font-size: 0.82rem;
             color: var(--text-muted);
             margin-top: 4px;
         }
 
-        /* Auto-Improver Switch Box */
-        .enhance-box {
-            background: #f0f9ff;
-            border: 1px solid #bae6fd;
+        /* Camera Box */
+        .camera-box {
+            display: none;
+            width: 100%;
+            height: 260px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+        }
+
+        .camera-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Auto-Enhance Box */
+        .enhance-bar {
+            background: #f8fafc;
+            border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 1rem;
+            padding: 12px 16px;
             margin-top: 1.25rem;
             display: flex;
             align-items: center;
@@ -286,23 +217,17 @@
         .enhance-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .enhance-info i {
-            font-size: 1.4rem;
-            color: #0284c7;
+            color: var(--primary);
+            font-size: 1.1rem;
         }
 
-        .enhance-text h5 {
-            font-size: 0.88rem;
+        .enhance-info span {
+            font-size: 0.85rem;
             font-weight: 700;
-            color: #0369a1;
-        }
-
-        .enhance-text p {
-            font-size: 0.78rem;
-            color: #0284c7;
         }
 
         /* Toggle Switch */
@@ -311,14 +236,9 @@
             display: inline-block;
             width: 44px;
             height: 24px;
-            flex-shrink: 0;
         }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .switch input { opacity: 0; width: 0; height: 0; }
 
         .slider {
             position: absolute;
@@ -341,317 +261,207 @@
             border-radius: 50%;
         }
 
-        input:checked + .slider {
-            background-color: #0284c7;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
         /* Preview Display */
-        .preview-box {
-            position: relative;
-            width: 100%;
-            height: 260px;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #0f172a;
+        .preview-display {
             display: none;
             margin-top: 1.25rem;
+            text-align: center;
+        }
+
+        .preview-display img {
+            max-width: 100%;
+            max-height: 240px;
+            border-radius: 12px;
             border: 1px solid var(--border);
         }
 
-        .preview-box img, .preview-box video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .enhanced-tag {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #0284c7;
-            color: #fff;
-            font-size: 0.72rem;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Buttons */
+        /* Primary Check Button */
         .btn-check {
             width: 100%;
             padding: 14px;
-            background: var(--brand-blue);
+            background: var(--primary);
             color: #fff;
             border: none;
             border-radius: 12px;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
+            margin-top: 1.25rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            margin-top: 1.25rem;
             transition: background 0.2s ease;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
         }
 
-        .btn-check:hover {
-            background: var(--brand-blue-hover);
+        .btn-check:hover { background: var(--primary-hover); }
+
+        /* Sample Quick Test Buttons */
+        .samples-section {
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1.25rem;
         }
 
-        /* Sample Images Row */
-        .sample-grid {
+        .samples-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .samples-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 8px;
+            gap: 8px;
         }
 
-        .sample-item {
-            border-radius: 10px;
+        .sample-thumb {
+            border-radius: 8px;
             overflow: hidden;
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             cursor: pointer;
-            transition: all 0.2s ease;
             background: #fff;
+            text-align: center;
         }
 
-        .sample-item:hover {
-            border-color: var(--brand-blue);
-            transform: translateY(-2px);
-        }
+        .sample-thumb:hover { border-color: var(--primary); }
 
-        .sample-item img {
+        .sample-thumb img {
             width: 100%;
-            height: 75px;
+            height: 65px;
             object-fit: cover;
             display: block;
         }
 
-        .sample-label {
+        .sample-thumb span {
+            display: block;
             font-size: 0.72rem;
             font-weight: 700;
-            text-align: center;
-            padding: 4px;
+            padding: 3px;
             background: #f8fafc;
-            color: var(--text-secondary);
+            color: var(--text-sub);
         }
 
-        /* Friendly Result Display */
-        .result-box {
+        /* Results Card */
+        .result-card {
             display: none;
-            animation: fadeIn 0.4s ease;
+            margin-top: 1.5rem;
+            border-radius: 14px;
+            padding: 1.5rem;
+            animation: slideUp 0.3s ease;
         }
 
-        @keyframes fadeIn {
+        @keyframes slideUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .result-banner {
-            border-radius: 14px;
-            padding: 1.5rem;
-            margin-bottom: 1.25rem;
-            text-align: center;
-        }
-
-        .result-banner.healthy {
+        .result-card.healthy {
             background: var(--success-bg);
             border: 1px solid var(--success-border);
             color: var(--success-text);
         }
 
-        .result-banner.cataract {
+        .result-card.cataract {
             background: var(--danger-bg);
             border: 1px solid var(--danger-border);
             color: var(--danger-text);
         }
 
-        .result-icon {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 0.75rem;
         }
 
-        .result-title {
-            font-size: 1.3rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-        }
+        .result-header i { font-size: 2rem; }
+        .result-header h3 { font-size: 1.25rem; font-weight: 800; }
 
-        .result-advice {
-            font-size: 0.9rem;
-            line-height: 1.5;
-            color: var(--text-dark);
-            background: #fff;
+        .advice-box {
+            background: #ffffff;
+            border-radius: 10px;
             padding: 1rem;
-            border-radius: 10px;
-            border: 1px solid var(--border);
             margin-top: 1rem;
-            text-align: left;
-        }
-
-        .certainty-bar {
-            height: 10px;
-            background: #e2e8f0;
-            border-radius: 20px;
-            overflow: hidden;
-            margin: 1rem 0;
-        }
-
-        .certainty-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--brand-blue);
-            transition: width 0.6s ease;
-        }
-
-        .percent-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 1rem;
-        }
-
-        .percent-card {
-            background: #f8fafc;
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 0.85rem;
-            text-align: center;
-        }
-
-        .percent-card .lbl {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .percent-card .val {
-            font-size: 1.2rem;
-            font-weight: 800;
-            font-family: 'JetBrains Mono', monospace;
-            margin-top: 2px;
+            color: var(--text-main);
+            font-size: 0.88rem;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
+    <!-- Header Navigation -->
     <header>
-        <div class="header-wrap">
-            <div class="logo-box">
-                <div class="logo-icon">
-                    <i class="fa-solid fa-eye"></i>
-                </div>
-                <div class="logo-text">
-                    <h1>EyeCheck AI</h1>
-                    <p>Easy Cataract & Eye Health Checker</p>
-                </div>
-            </div>
-
-            <div class="accuracy-badge">
-                <i class="fa-solid fa-circle-check"></i>
-                96.5% AI Accuracy Tested
+        <div class="header-container">
+            <a href="#" class="brand-logo">
+                <i class="fa-solid fa-eye"></i>
+                <h1>EyeCheck</h1>
+            </a>
+            <div class="badge-accuracy">
+                <i class="fa-solid fa-shield-check"></i> 96.5% AI Accuracy
             </div>
         </div>
     </header>
 
-    <!-- 3-Step Guide -->
-    <div class="step-bar">
-        <div class="step-card">
-            <div class="step-num">1</div>
-            <div class="step-info">
-                <h4>Choose Eye Photo</h4>
-                <p>Upload a file, take a picture, or pick a sample</p>
-            </div>
-        </div>
-        <div class="step-card">
-            <div class="step-num">2</div>
-            <div class="step-info">
-                <h4>✨ Auto-Enhance (Optional)</h4>
-                <p>Fixes dark or blurry photos automatically</p>
-            </div>
-        </div>
-        <div class="step-card">
-            <div class="step-num">3</div>
-            <div class="step-info">
-                <h4>Instant Results</h4>
-                <p>Clear answer with helpful health advice</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Workspace -->
-    <div class="main-workspace">
+    <!-- App Container -->
+    <div class="app-container">
         
-        <!-- Left Panel: Input & Auto-Improver Controls -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fa-solid fa-camera"></i> Step 1: Add Your Eye Photo
-                </div>
-            </div>
+        <div class="title-section">
+            <h2>Simple Eye Health & Cataract Checker</h2>
+            <p>Upload an eye picture or take a camera snapshot for an instant check</p>
+        </div>
 
-            <!-- Tabs -->
-            <div class="tab-group">
-                <button class="tab-btn active" onclick="switchInputMode('upload', event)">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload Photo
+        <div class="main-card">
+            
+            <!-- Input Option Buttons -->
+            <div class="input-options">
+                <button class="opt-btn active" id="btnOptUpload" onclick="switchInput('upload')">
+                    <i class="fa-solid fa-upload"></i> Upload Photo
                 </button>
-                <button class="tab-btn" onclick="switchInputMode('webcam', event)">
-                    <i class="fa-solid fa-video"></i> Use Camera
-                </button>
-                <button class="tab-btn" onclick="switchInputMode('samples', event)">
-                    <i class="fa-solid fa-images"></i> Sample Photos
+                <button class="opt-btn" id="btnOptCamera" onclick="switchInput('camera')">
+                    <i class="fa-solid fa-camera"></i> Use Camera
                 </button>
             </div>
 
-            <!-- Upload Option -->
-            <div id="uploadTab">
-                <div class="dropzone" onclick="document.getElementById('fileInput').click()">
-                    <i class="fa-solid fa-circle-plus"></i>
-                    <div class="dropzone-text">Click here to choose an eye picture</div>
-                    <div class="dropzone-subtext">Supports PNG, JPG, JPEG photos from your device</div>
-                    <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelected(event)">
+            <!-- Upload Area -->
+            <div id="areaUpload">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <i class="fa-solid fa-image"></i>
+                    <h4>Click to select an eye picture</h4>
+                    <p>Supports PNG, JPG, JPEG photos from your device</p>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="onFilePicked(event)">
                 </div>
             </div>
 
-            <!-- Camera Option -->
-            <div id="webcamTab" style="display: none;">
-                <div class="preview-box" id="webcamFrame" style="display: block;">
-                    <video id="webcamVideo" autoplay playsinline></video>
+            <!-- Camera View -->
+            <div id="areaCamera" style="display: none;">
+                <div class="camera-box">
+                    <video id="webcam" autoplay playsinline></video>
                 </div>
-                <button class="btn-check" onclick="takeWebcamSnapshot()">
-                    <i class="fa-solid fa-camera"></i> Take Snapshot & Check Eye
+                <button class="btn-check" onclick="snapCamera()" style="margin-top: 10px;">
+                    <i class="fa-solid fa-circle-dot"></i> Take Snapshot & Check
                 </button>
             </div>
 
-            <!-- Sample Photos Option -->
-            <div id="samplesTab" style="display: none;">
-                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Click any sample eye photo to test live:</div>
-                <div class="sample-grid">
-                    {% for img in sample_images %}
-                    <div class="sample-item" onclick="loadSamplePhoto('{{ img.url }}')">
-                        <img src="{{ img.url }}" alt="{{ img.label }}">
-                        <div class="sample-label">{{ img.label }}</div>
-                    </div>
-                    {% endfor %}
-                </div>
+            <!-- Image Preview Display -->
+            <div class="preview-display" id="previewDisplay">
+                <img id="previewImg" src="" alt="Selected Eye Picture">
             </div>
 
-            <!-- Auto-Improver Feature Toggle Switch -->
-            <div class="enhance-box">
+            <!-- Auto-Enhance Switch -->
+            <div class="enhance-bar">
                 <div class="enhance-info">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <div class="enhance-text">
-                        <h5>✨ Auto-Enhance Photo</h5>
-                        <p>Improves dark, blurry, or low-contrast photos automatically</p>
-                    </div>
+                    <span>Auto-Fix Dark / Low Contrast Photos</span>
                 </div>
                 <label class="switch">
                     <input type="checkbox" id="enhanceToggle" checked>
@@ -659,142 +469,118 @@
                 </label>
             </div>
 
-            <!-- Image Preview Box -->
-            <div class="preview-box" id="imagePreviewBox">
-                <img id="previewImageTag" src="" alt="Selected Eye Photo">
-                <div class="enhanced-tag" id="enhancedBadge" style="display: none;"><i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Enhanced</div>
-            </div>
-
-            <button class="btn-check" id="checkEyeBtn" onclick="runEyeCheck()" style="display: none;">
-                <i class="fa-solid fa-circle-play"></i> Check My Eye Now
+            <!-- Main Check Button -->
+            <button class="btn-check" id="btnCheckNow" onclick="runCheck()" style="display: none;">
+                <i class="fa-solid fa-magnifying-glass"></i> Check My Eye Now
             </button>
+
+            <!-- Results Output Card -->
+            <div class="result-card" id="resultCard">
+                <div class="result-header">
+                    <i class="fa-solid fa-circle-check" id="resIcon"></i>
+                    <div>
+                        <h3 id="resTitle">Healthy Clear Eye</h3>
+                        <div style="font-size: 0.85rem; font-weight: 700;" id="resCertainty">98.5% Certainty</div>
+                    </div>
+                </div>
+
+                <div class="advice-box" id="resAdvice">
+                    Your eye lens appears clear and healthy! No signs of cataract cloudiness were detected.
+                </div>
+            </div>
+
+            <!-- Quick Samples Section -->
+            <div class="samples-section">
+                <div class="samples-title">Or click a sample photo to test instantly:</div>
+                <div class="samples-grid">
+                    {% for img in sample_images %}
+                    <div class="sample-thumb" onclick="pickSample('{{ img.url }}')">
+                        <img src="{{ img.url }}" alt="Sample Eye">
+                        <span>{{ img.label }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
         </div>
-
-        <!-- Right Panel: Easy Results & Health Advice -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fa-solid fa-square-poll-vertical"></i> Step 2: Your Health Results
-                </div>
-            </div>
-
-            <!-- Initial Empty State -->
-            <div id="emptyState" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
-                <i class="fa-solid fa-eye-slash" style="font-size: 3rem; margin-bottom: 1rem; color: #cbd5e1;"></i>
-                <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-dark);">No Photo Analyzed Yet</h4>
-                <p style="font-size: 0.85rem; margin-top: 4px;">Choose an eye photo on the left and click "Check My Eye Now" to see your results here.</p>
-            </div>
-
-            <!-- Result Output Container -->
-            <div class="result-box" id="resultBox">
-                <div class="result-banner healthy" id="resultBanner">
-                    <i class="fa-solid fa-circle-check result-icon" id="resultIcon"></i>
-                    <div class="result-title" id="resultTitle">Healthy Clear Eye (No Cataract)</div>
-                    <div style="font-size: 0.88rem; font-weight: 600;" id="certaintyText">98.5% Certainty</div>
-
-                    <div class="certainty-bar">
-                        <div class="certainty-fill" id="certaintyFill"></div>
-                    </div>
-                </div>
-
-                <div class="result-advice">
-                    <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; color: var(--text-dark);">
-                        <i class="fa-solid fa-user-doctor" style="color: var(--brand-blue);"></i> What This Means:
-                    </div>
-                    <p id="adviceText">Your eye lens appears clear and transparent. No signs of cataract cloudiness were detected in this photo.</p>
-                </div>
-
-                <div class="percent-grid">
-                    <div class="percent-card">
-                        <div class="lbl">Cataract Risk Score</div>
-                        <div class="val" id="cataractPercentVal" style="color: var(--danger-text);">0.0%</div>
-                    </div>
-                    <div class="percent-card">
-                        <div class="lbl">Clear Lens Score</div>
-                        <div class="val" id="normalPercentVal" style="color: var(--success-text);">0.0%</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <script>
-        let selectedFileObj = null;
-        let base64ImgData = null;
-        let webcamStreamTrack = null;
+        let fileObject = null;
+        let base64Image = null;
+        let streamTrack = null;
 
-        function switchInputMode(mode, evt) {
-            document.querySelectorAll('.tab-group .tab-btn').forEach(b => b.classList.remove('active'));
-            evt.currentTarget.classList.add('active');
+        function switchInput(type) {
+            document.getElementById('btnOptUpload').classList.toggle('active', type === 'upload');
+            document.getElementById('btnOptCamera').classList.toggle('active', type === 'camera');
 
-            document.getElementById('uploadTab').style.display = (mode === 'upload') ? 'block' : 'none';
-            document.getElementById('webcamTab').style.display = (mode === 'webcam') ? 'block' : 'none';
-            document.getElementById('samplesTab').style.display = (mode === 'samples') ? 'block' : 'none';
+            document.getElementById('areaUpload').style.display = (type === 'upload') ? 'block' : 'none';
+            document.getElementById('areaCamera').style.display = (type === 'camera') ? 'block' : 'none';
 
-            if (mode === 'webcam') {
-                startWebcam();
+            if (type === 'camera') {
+                startCamera();
             } else {
-                stopWebcam();
+                stopCamera();
             }
         }
 
-        function handleFileSelected(evt) {
+        function onFilePicked(evt) {
             const file = evt.target.files[0];
             if (file) {
-                selectedFileObj = file;
-                base64ImgData = null;
+                fileObject = file;
+                base64Image = null;
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('previewImageTag').src = e.target.result;
-                    document.getElementById('imagePreviewBox').style.display = 'block';
-                    document.getElementById('checkEyeBtn').style.display = 'flex';
-                    document.getElementById('enhancedBadge').style.display = 'none';
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('previewDisplay').style.display = 'block';
+                    document.getElementById('btnCheckNow').style.display = 'flex';
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function startWebcam() {
+        function startCamera() {
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(stream => {
-                        webcamStreamTrack = stream;
-                        document.getElementById('webcamVideo').srcObject = stream;
+                    .then(s => {
+                        streamTrack = s;
+                        document.getElementById('webcam').srcObject = s;
+                        document.querySelector('.camera-box').style.display = 'block';
                     })
-                    .catch(err => alert("Camera error: " + err));
+                    .catch(err => alert("Camera access error: " + err));
             }
         }
 
-        function stopWebcam() {
-            if (webcamStreamTrack) {
-                webcamStreamTrack.getTracks().forEach(t => t.stop());
-                webcamStreamTrack = null;
+        function stopCamera() {
+            if (streamTrack) {
+                streamTrack.getTracks().forEach(t => t.stop());
+                streamTrack = null;
             }
+            document.querySelector('.camera-box').style.display = 'none';
         }
 
-        function takeWebcamSnapshot() {
-            const video = document.getElementById('webcamVideo');
+        function snapCamera() {
+            const video = document.getElementById('webcam');
             const canvas = document.createElement('canvas');
             canvas.width = 224;
             canvas.height = 224;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, 224, 224);
 
-            base64ImgData = canvas.toDataURL('image/jpeg');
-            selectedFileObj = null;
+            base64Image = canvas.toDataURL('image/jpeg');
+            fileObject = null;
 
-            document.getElementById('previewImageTag').src = base64ImgData;
-            document.getElementById('imagePreviewBox').style.display = 'block';
-            document.getElementById('checkEyeBtn').style.display = 'flex';
+            document.getElementById('previewImg').src = base64Image;
+            document.getElementById('previewDisplay').style.display = 'block';
+            document.getElementById('btnCheckNow').style.display = 'flex';
 
-            runEyeCheck();
+            runCheck();
         }
 
-        function loadSamplePhoto(url) {
-            document.getElementById('previewImageTag').src = url;
-            document.getElementById('imagePreviewBox').style.display = 'block';
-            document.getElementById('checkEyeBtn').style.display = 'flex';
+        function pickSample(url) {
+            document.getElementById('previewImg').src = url;
+            document.getElementById('previewDisplay').style.display = 'block';
+            document.getElementById('btnCheckNow').style.display = 'flex';
 
             const img = new Image();
             img.crossOrigin = "Anonymous";
@@ -804,31 +590,31 @@
                 canvas.height = 224;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, 224, 224);
-                base64ImgData = canvas.toDataURL('image/jpeg');
-                selectedFileObj = null;
-                runEyeCheck();
+                base64Image = canvas.toDataURL('image/jpeg');
+                fileObject = null;
+                runCheck();
             };
             img.src = url;
         }
 
-        async function runEyeCheck() {
+        async function runCheck() {
             const shouldEnhance = document.getElementById('enhanceToggle').checked;
 
             let formData = new FormData();
-            let bodyObj = {};
+            let bodyData = {};
             let isJson = false;
 
-            if (selectedFileObj) {
-                formData.append('file', selectedFileObj);
+            if (fileObject) {
+                formData.append('file', fileObject);
                 formData.append('auto_enhance', shouldEnhance ? 'true' : 'false');
-            } else if (base64ImgData) {
-                bodyObj = JSON.stringify({
-                    image_base64: base64ImgData,
+            } else if (base64Image) {
+                bodyData = JSON.stringify({
+                    image_base64: base64Image,
                     auto_enhance: shouldEnhance
                 });
                 isJson = true;
             } else {
-                alert("Please select or upload an eye picture first!");
+                alert("Please select or take an eye picture first.");
                 return;
             }
 
@@ -836,7 +622,7 @@
                 const res = await fetch('/api/predict', {
                     method: 'POST',
                     headers: isJson ? { 'Content-Type': 'application/json' } : {},
-                    body: isJson ? bodyObj : formData
+                    body: isJson ? bodyData : formData
                 });
 
                 const data = await res.json();
@@ -845,41 +631,29 @@
                     return;
                 }
 
-                // If auto-enhanced, update preview image with improved version
                 if (data.is_auto_enhanced && data.enhanced_preview_b64) {
-                    document.getElementById('previewImageTag').src = data.enhanced_preview_b64;
-                    document.getElementById('enhancedBadge').style.display = 'block';
-                } else {
-                    document.getElementById('enhancedBadge').style.display = 'none';
+                    document.getElementById('previewImg').src = data.enhanced_preview_b64;
                 }
 
-                // Render Results
-                document.getElementById('emptyState').style.display = 'none';
-                
-                const banner = document.getElementById('resultBanner');
-                const icon = document.getElementById('resultIcon');
-                
+                const card = document.getElementById('resultCard');
+                const icon = document.getElementById('resIcon');
+
                 if (data.diagnosis.includes("Healthy") || data.diagnosis.includes("Clear")) {
-                    banner.className = "result-banner healthy";
-                    icon.className = "fa-solid fa-circle-check result-icon";
+                    card.className = "result-card healthy";
+                    icon.className = "fa-solid fa-circle-check";
                 } else {
-                    banner.className = "result-banner cataract";
-                    icon.className = "fa-solid fa-circle-exclamation result-icon";
+                    card.className = "result-card cataract";
+                    icon.className = "fa-solid fa-circle-exclamation";
                 }
 
-                document.getElementById('resultTitle').innerText = data.diagnosis;
-                document.getElementById('certaintyText').innerText = data.confidence + '% Certainty';
-                document.getElementById('certaintyFill').style.width = data.confidence + '%';
-                document.getElementById('certaintyFill').style.background = data.status_color;
+                document.getElementById('resTitle').innerText = data.diagnosis;
+                document.getElementById('resCertainty').innerText = data.confidence + '% Certainty';
+                document.getElementById('resAdvice').innerText = data.user_advice;
 
-                document.getElementById('adviceText').innerText = data.user_advice;
-                document.getElementById('cataractPercentVal').innerText = data.cataract_probability + '%';
-                document.getElementById('normalPercentVal').innerText = data.normal_probability + '%';
-
-                document.getElementById('resultBox').style.display = 'block';
+                card.style.display = 'block';
 
             } catch (err) {
-                console.error("Eye Check Error:", err);
+                console.error("Check Error:", err);
             }
         }
     </script>
