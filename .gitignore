@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+*.swp
+*.tmp
+
+# Datasets & Temp Files
+dataset/raw/
+dataset/processed/
+temp_*/
+*.zip
+*.tar.gz
+.cache/
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/

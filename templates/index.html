@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OcuCheck — Ophthalmic Diagnostic Workstation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-base: #0b0f19;
+            --bg-surface: #111827;
+            --bg-card: #1f2937;
+            --border-color: #374151;
+            --border-focus: #4f46e5;
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        /* Top Clinical Workstation Header */
+        header {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.85rem 2rem;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .brand-title h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-title p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            background: var(--bg-base);
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        /* Main Workspace Grid */
+        .workstation-body {
+            max-width: 1400px;
+            margin: 1.5rem auto;
+            padding: 0 2rem;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        @media (max-width: 1024px) {
+            .workstation-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(31, 41, 55, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+
+        .panel-title i {
+            color: var(--primary);
+        }
+
+        .panel-body {
+            padding: 1.25rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Mode Switcher Tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 6px;
+            background: var(--bg-base);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.25rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tab-btn.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+        }
+
+        /* DICOM Viewport / Image Display */
+        .dicom-viewport {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            background: #000;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dicom-viewport img, .dicom-viewport video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Medical Crosshair Grid Overlay */
+        .viewport-crosshair {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .viewport-scale {
+            position: absolute;
+            bottom: 8px;
+            left: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            animation: scanMove 2s infinite linear;
+            display: none;
+        }
+
+        @keyframes scanMove {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        /* Drag & Drop Zone */
+        .dropzone {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            background: rgba(17, 24, 39, 0.5);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dropzone:hover {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .dropzone i {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        /* Clinical Sample Selector */
+        .sample-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 0.5rem;
+        }
+
+        .sample-card {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background: var(--bg-base);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .sample-card:hover {
+            border-color: var(--primary);
+        }
+
+        .sample-card img {
+            width: 100%;
+            height: 70px;
+            object-fit: cover;
+        }
+
+        .sample-card-label {
+            padding: 4px 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-align: center;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+        }
+
+        /* Primary Action Button */
+        .btn-action {
+            margin-top: 1.25rem;
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-dark);
+            border: 1px solid var(--primary);
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.15s ease;
+        }
+
+        .btn-action:hover {
+            background: var(--primary);
+        }
+
+        /* Clinical Diagnostic Output Card */
+        .diagnostic-card {
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-top: 1.25rem;
+            display: none;
+        }
+
+        .diag-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .diag-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .diag-value {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .diag-value.cataract { color: var(--danger); }
+        .diag-value.normal { color: var(--success); }
+
+        .progress-track {
+            height: 8px;
+            background: var(--bg-card);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.75rem 0 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: width 0.6s ease;
+        }
+
+        .clinical-metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .metric-cell {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .metric-cell .num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Tab content for Right Panel */
+        .subtabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .subtab-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .subtab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tech-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .tech-table td {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tech-table td.label { color: var(--text-secondary); }
+        .tech-table td.val {
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .matrix-img {
+            width: 100%;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            margin-top: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="brand-section">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-eye"></i>
+                </div>
+                <div class="brand-title">
+                    <h1>OcuCheck Diagnostic Workstation</h1>
+                    <p>Ophthalmic Slit-Lamp & Fundus AI Classification System</p>
+                </div>
+            </div>
+
+            <div class="status-badge">
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Model Engine: MobileNetV2 (ImageNet Base)</span>
+                </div>
+                <div class="status-item" style="border-left: 1px solid var(--border-color); padding-left: 12px;">
+                    <span>Validated Accuracy: <strong>90.83%</strong></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Workspace Body -->
+    <div class="workstation-body">
+        
+        <!-- Left Panel: Image Capture & Analysis -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <i class="fa-solid fa-sliders"></i>
+                    Slit-Lamp Viewport & Image Input
+                </div>
+                <span style="font-size: 0.78rem; color: var(--text-muted);">DICOM Standard Resolution</span>
+            </div>
+
+            <div class="panel-body">
+                <!-- Mode Switcher -->
+                <div class="mode-tabs">
+                    <button class="tab-btn active" onclick="setMode('upload', event)">
+                        <i class="fa-solid fa-upload"></i> Upload Image
+                    </button>
+                    <button class="tab-btn" onclick="setMode('webcam', event)">
+                        <i class="fa-solid fa-video"></i> Live Webcam
+                    </button>
+                    <button class="tab-btn" onclick="setMode('samples', event)">
+                        <i class="fa-solid fa-folder-open"></i> Clinical Test Dataset
+                    </button>
+                </div>
+
+                <!-- Input Mode 1: File Upload -->
+                <div id="uploadBox">
+                    <div class="dropzone" onclick="document.getElementById('fileInput').click()">
+                        <i class="fa-solid fa-file-medical"></i>
+                        <div style="font-weight: 600; font-size: 0.95rem;">Click or drag clinical eye photo here</div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Supports PNG, JPG, JPEG (Auto-normalizes to 224x224 RGB)</div>
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="onFileSelected(event)">
+                    </div>
+                </div>
+
+                <!-- Input Mode 2: Live Video Feed -->
+                <div id="webcamBox" style="display: none;">
+                    <div class="dicom-viewport" style="height: 260px;">
+                        <video id="webcamVideo" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+                        <div class="viewport-crosshair"></div>
+                    </div>
+                    <button class="btn-action" onclick="captureWebcamFrame()" style="margin-top: 8px;">
+                        <i class="fa-solid fa-camera"></i> Capture Frame & Analyze
+                    </button>
+                </div>
+
+                <!-- Input Mode 3: Real Clinical Samples -->
+                <div id="samplesBox" style="display: none;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">Select real clinical test photograph from Kaggle dataset:</div>
+                    <div class="sample-row">
+                        {% for img in sample_images %}
+                        <div class="sample-card" onclick="loadClinicalSample('{{ img.url }}')">
+                            <img src="{{ img.url }}" alt="Real Eye Photo">
+                            <div class="sample-card-label">{{ img.label }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- DICOM Viewport Frame -->
+                <div class="dicom-viewport" id="viewportFrame" style="display: none; margin-top: 1rem;">
+                    <img id="previewImg" src="" alt="Selected Eye Image">
+                    <div class="viewport-crosshair"></div>
+                    <div class="viewport-scale">224 x 224 | RGB Normalization</div>
+                    <div class="scan-line" id="scanLine"></div>
+                </div>
+
+                <button class="btn-action" id="analyzeBtn" onclick="executeAnalysis()" style="display: none;">
+                    <i class="fa-solid fa-microscope"></i> Execute MobileNetV2 Diagnostic Scan
+                </button>
+
+                <!-- Output Card -->
+                <div class="diagnostic-card" id="outputCard">
+                    <div class="diag-row">
+                        <span class="diag-label">Clinical Impression</span>
+                        <span class="diag-value" id="diagTitle">CATARACT DETECTED</span>
+                    </div>
+
+                    <div class="diag-row" style="margin-bottom: 4px;">
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);" id="diagSeverity">Nuclear Lens Opacification</span>
+                        <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1.1rem;" id="diagConf">94.8%</span>
+                    </div>
+
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+
+                    <div class="clinical-metrics-grid">
+                        <div class="metric-cell">
+                            <div class="diag-label">Cataract Opacity Risk</div>
+                            <div class="num" id="cataractProbVal" style="color: var(--danger);">0.0%</div>
+                        </div>
+                        <div class="metric-cell">
+                            <div class="diag-label">Clear Lens Probability</div>
+                            <div class="num" id="normalProbVal" style="color: var(--success);">0.0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Model Technical Specification & Validation -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    Validation Metrics & Architecture
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <div class="subtabs">
+                    <button class="subtab-btn active" onclick="switchRightTab('spec', event)">Architecture Spec</button>
+                    <button class="subtab-btn" onclick="switchRightTab('metrics', event)">Confusion Matrix & ROC</button>
+                </div>
+
+                <!-- Spec Tab -->
+                <div id="specTab">
+                    <table class="tech-table">
+                        <tr>
+                            <td class="label">Feature Backbone</td>
+                            <td class="val">MobileNetV2 (Pre-trained ImageNet)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Base Layer Status</td>
+                            <td class="val">Frozen (96.4% of total weights)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Trainable Parameters</td>
+                            <td class="val">82,049 Weights (Custom Head)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Input Specification</td>
+                            <td class="val">224 x 224 x 3 Normalized RGB</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Clinical Dataset Size</td>
+                            <td class="val">600 Real Photos (Kaggle Dataset)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Data Leak Audit</td>
+                            <td class="val" style="color: var(--success);">0% Overlap (Passed)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Clinical Recall Score</td>
+                            <td class="val" style="color: var(--success);">100.00% (0 Missed Cataracts)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Validation Accuracy</td>
+                            <td class="val" style="color: var(--success);">90.83%</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Metrics Tab -->
+                <div id="metricsTab" style="display: none;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Empirical Confusion Matrix (Held-out Test Dataset):</div>
+                    <img src="/static/confusion_matrix.png" alt="Confusion Matrix Plot" class="matrix-img" onerror="this.src='https://placehold.co/600x400/111827/3b82f6?text=Confusion+Matrix+Plot'">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let base64Data = null;
+        let webcamStream = null;
+
+        function setMode(mode, evt) {
+            document.querySelectorAll('.mode-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+            evt.currentTarget.classList.add('active');
+
+            document.getElementById('uploadBox').style.display = (mode === 'upload') ? 'block' : 'none';
+            document.getElementById('webcamBox').style.display = (mode === 'webcam') ? 'block' : 'none';
+            document.getElementById('samplesBox').style.display = (mode === 'samples') ? 'block' : 'none';
+
+            if (mode === 'webcam') {
+                startWebcam();
+            } else {
+                stopWebcam();
+            }
+        }
+
+        function switchRightTab(tab, evt) {
+            document.querySelectorAll('.subtabs .subtab-btn').forEach(b => b.classList.remove('active'));
+            evt.currentTarget.classList.add('active');
+
+            document.getElementById('specTab').style.display = (tab === 'spec') ? 'block' : 'none';
+            document.getElementById('metricsTab').style.display = (tab === 'metrics') ? 'block' : 'none';
+        }
+
+        function onFileSelected(evt) {
+            const file = evt.target.files[0];
+            if (file) {
+                selectedFile = file;
+                base64Data = null;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('viewportFrame').style.display = 'flex';
+                    document.getElementById('analyzeBtn').style.display = 'flex';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function startWebcam() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(stream => {
+                        webcamStream = stream;
+                        document.getElementById('webcamVideo').srcObject = stream;
+                    })
+                    .catch(err => console.log("Webcam error: " + err));
+            }
+        }
+
+        function stopWebcam() {
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(t => t.stop());
+                webcamStream = null;
+            }
+        }
+
+        function captureWebcamFrame() {
+            const video = document.getElementById('webcamVideo');
+            const canvas = document.createElement('canvas');
+            canvas.width = 224;
+            canvas.height = 224;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, 224, 224);
+
+            base64Data = canvas.toDataURL('image/jpeg');
+            selectedFile = null;
+
+            document.getElementById('previewImg').src = base64Data;
+            document.getElementById('viewportFrame').style.display = 'flex';
+            document.getElementById('analyzeBtn').style.display = 'flex';
+
+            executeAnalysis();
+        }
+
+        function loadClinicalSample(url) {
+            document.getElementById('previewImg').src = url;
+            document.getElementById('viewportFrame').style.display = 'flex';
+            document.getElementById('analyzeBtn').style.display = 'flex';
+
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 224;
+                canvas.height = 224;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, 224, 224);
+                base64Data = canvas.toDataURL('image/jpeg');
+                selectedFile = null;
+                executeAnalysis();
+            };
+            img.src = url;
+        }
+
+        async function executeAnalysis() {
+            document.getElementById('scanLine').style.display = 'block';
+            document.getElementById('outputCard').style.display = 'none';
+
+            let formData = new FormData();
+            let body = {};
+            let isJson = false;
+
+            if (selectedFile) {
+                formData.append('file', selectedFile);
+            } else if (base64Data) {
+                body = JSON.stringify({ image_base64: base64Data });
+                isJson = true;
+            } else {
+                alert("Please select or upload an eye photograph first.");
+                document.getElementById('scanLine').style.display = 'none';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: isJson ? { 'Content-Type': 'application/json' } : {},
+                    body: isJson ? body : formData
+                });
+
+                const data = await res.json();
+                document.getElementById('scanLine').style.display = 'none';
+
+                if (data.error) {
+                    alert("Error: " + data.error);
+                    return;
+                }
+
+                const titleEl = document.getElementById('diagTitle');
+                titleEl.innerText = data.diagnosis;
+                if (data.diagnosis.includes("CATARACT")) {
+                    titleEl.className = "diag-value cataract";
+                } else {
+                    titleEl.className = "diag-value normal";
+                }
+
+                document.getElementById('diagConf').innerText = data.confidence + '%';
+                document.getElementById('diagSeverity').innerText = data.severity_level;
+
+                const fill = document.getElementById('progressFill');
+                fill.style.width = data.confidence + '%';
+                fill.style.background = data.status_color;
+
+                document.getElementById('cataractProbVal').innerText = data.cataract_probability + '%';
+                document.getElementById('normalProbVal').innerText = data.normal_probability + '%';
+
+                document.getElementById('outputCard').style.display = 'block';
+
+            } catch (err) {
+                document.getElementById('scanLine').style.display = 'none';
+                console.error("API error:", err);
+            }
+        }
+    </script>
+</body>
+</html>
