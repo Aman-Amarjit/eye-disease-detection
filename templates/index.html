@@ -3,29 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ophthalmic AI Workstation v2.4 — Clinical Slit-Lamp Analysis</title>
+    <title>EyeCheck AI — Easy Eye Health & Cataract Checker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
         :root {
-            --slate-900: #0f172a;
-            --slate-800: #1e293b;
-            --slate-700: #334155;
-            --slate-600: #475569;
-            --slate-500: #64748b;
-            --slate-300: #cbd5e1;
-            --slate-100: #f1f5f9;
-            --slate-50: #f8fafc;
-            --clinical-blue: #0284c7;
-            --clinical-blue-dark: #0369a1;
-            --danger-red: #dc2626;
-            --success-green: #16a34a;
-            --warning-amber: #d97706;
+            --bg-page: #f8fafc;
+            --surface: #ffffff;
             --border: #e2e8f0;
-            --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --text-dark: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --brand-blue: #2563eb;
+            --brand-blue-hover: #1d4ed8;
+            --success-bg: #f0fdf4;
+            --success-border: #bbf7d0;
+            --success-text: #15803d;
+            --danger-bg: #fef2f2;
+            --danger-border: #fecaca;
+            --danger-text: #b91c1c;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08);
         }
 
         * {
@@ -35,591 +36,683 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f1f5f9;
-            color: var(--slate-900);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            font-size: 13px;
-            -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
         }
 
-        /* Hospital Top Navigation Bar */
-        .clinic-header {
-            background-color: var(--slate-900);
-            color: #fff;
-            padding: 0.6rem 1.5rem;
+        /* Top Header */
+        header {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .header-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid var(--clinical-blue);
         }
 
-        .header-brand {
+        .logo-box {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .header-brand i {
-            font-size: 1.2rem;
-            color: var(--clinical-blue);
-        }
-
-        .header-brand h1 {
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 0.2px;
-            text-transform: uppercase;
-        }
-
-        .header-brand span {
-            font-size: 11px;
-            color: var(--slate-400);
-            font-weight: 400;
-            margin-left: 6px;
-        }
-
-        .patient-bar {
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #2563eb, #0284c7);
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            gap: 20px;
-            font-size: 12px;
-            color: var(--slate-300);
-            background: var(--slate-800);
-            padding: 4px 12px;
-            border-radius: 4px;
-            border: 1px solid var(--slate-700);
-        }
-
-        .patient-bar strong {
+            justify-content: center;
             color: #fff;
-            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
 
-        /* Clinical Main Layout */
-        .workspace {
-            max-width: 1440px;
-            margin: 1rem auto;
-            padding: 0 1.5rem;
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 420px;
-            gap: 1rem;
+        .logo-text h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.3px;
+        }
+
+        .logo-text p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .accuracy-badge {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Simple 3-Step Guide Bar */
+        .step-bar {
+            max-width: 1200px;
+            margin: 1.5rem auto 0 auto;
+            padding: 0 2rem;
             width: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
         }
 
-        @media (max-width: 1024px) {
-            .workspace {
+        @media (max-width: 768px) {
+            .step-bar {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .step-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .step-num {
+            width: 36px;
+            height: 36px;
+            background: #eff6ff;
+            color: var(--brand-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .step-info h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .step-info p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        /* Main Workspace Container */
+        .main-workspace {
+            max-width: 1200px;
+            margin: 1.5rem auto 3rem auto;
+            padding: 0 2rem;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .main-workspace {
                 grid-template-columns: 1fr;
             }
         }
 
         .card {
-            background: #fff;
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            box-shadow: var(--card-shadow);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         .card-header {
-            background: var(--slate-50);
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.25rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
         }
 
         .card-title {
-            font-size: 12px;
+            font-size: 1.05rem;
             font-weight: 700;
-            color: var(--slate-800);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
+            color: var(--text-dark);
         }
 
         .card-title i {
-            color: var(--slate-600);
+            color: var(--brand-blue);
         }
 
-        .card-body {
-            padding: 14px;
+        /* Input Method Tabs */
+        .tab-group {
+            display: flex;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 1.25rem;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Tab Controls */
-        .tab-bar {
-            display: flex;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 12px;
-        }
-
-        .tab-item {
-            padding: 6px 14px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--slate-600);
-            background: none;
+            padding: 9px;
             border: none;
-            border-bottom: 2px solid transparent;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 8px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .tab-item.active {
-            color: var(--clinical-blue);
-            border-bottom-color: var(--clinical-blue);
-            background: var(--slate-50);
-        }
-
-        /* DICOM Inspection Viewport */
-        .dicom-frame {
-            position: relative;
-            width: 100%;
-            height: 380px;
-            background: #000;
-            border: 1px solid var(--slate-700);
-            border-radius: 4px;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            gap: 8px;
         }
 
-        .dicom-frame img, .dicom-frame video {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .dicom-hud {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: #22c55e;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 3px 8px;
-            border-radius: 3px;
-            pointer-events: none;
-            line-height: 1.4;
-        }
-
-        .dicom-scale {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: var(--slate-300);
-            background: rgba(0, 0, 0, 0.7);
-            padding: 2px 6px;
-            border-radius: 3px;
-            pointer-events: none;
+        .tab-btn.active {
+            background: #fff;
+            color: var(--brand-blue);
+            box-shadow: var(--shadow);
         }
 
         /* Upload Dropzone */
-        .clinic-dropzone {
-            border: 2px dashed var(--slate-300);
-            border-radius: 6px;
-            padding: 2.5rem 1rem;
+        .dropzone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
             text-align: center;
-            background: var(--slate-50);
+            background: #f8fafc;
             cursor: pointer;
-            transition: border-color 0.2s ease;
+            transition: all 0.2s ease;
         }
 
-        .clinic-dropzone:hover {
-            border-color: var(--clinical-blue);
+        .dropzone:hover {
+            border-color: var(--brand-blue);
+            background: #eff6ff;
+        }
+
+        .dropzone i {
+            font-size: 2.5rem;
+            color: var(--brand-blue);
+            margin-bottom: 0.75rem;
+        }
+
+        .dropzone-text {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .dropzone-subtext {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Auto-Improver Switch Box */
+        .enhance-box {
             background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .clinic-dropzone i {
-            font-size: 2rem;
-            color: var(--slate-500);
-            margin-bottom: 8px;
+        .enhance-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .btn-clinic {
+        .enhance-info i {
+            font-size: 1.4rem;
+            color: #0284c7;
+        }
+
+        .enhance-text h5 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #0369a1;
+        }
+
+        .enhance-text p {
+            font-size: 0.78rem;
+            color: #0284c7;
+        }
+
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #0284c7;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Preview Display */
+        .preview-box {
+            position: relative;
             width: 100%;
-            padding: 9px 14px;
-            background: var(--slate-900);
+            height: 260px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0f172a;
+            display: none;
+            margin-top: 1.25rem;
+            border: 1px solid var(--border);
+        }
+
+        .preview-box img, .preview-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .enhanced-tag {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #0284c7;
             color: #fff;
-            border: 1px solid var(--slate-800);
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Buttons */
+        .btn-check {
+            width: 100%;
+            padding: 14px;
+            background: var(--brand-blue);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 1.25rem;
+            transition: background 0.2s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
-        .btn-clinic:hover {
-            background: var(--slate-800);
+        .btn-check:hover {
+            background: var(--brand-blue-hover);
         }
 
-        .btn-clinic-primary {
-            background: var(--clinical-blue);
-            border-color: var(--clinical-blue-dark);
-        }
-
-        .btn-clinic-primary:hover {
-            background: var(--clinical-blue-dark);
-        }
-
-        /* Sample Gallery Table */
+        /* Sample Images Row */
         .sample-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 10px;
             margin-top: 8px;
         }
 
-        .sample-cell {
-            border: 1px solid var(--border);
-            border-radius: 4px;
+        .sample-item {
+            border-radius: 10px;
             overflow: hidden;
-            background: #fff;
+            border: 2px solid var(--border);
             cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fff;
         }
 
-        .sample-cell:hover {
-            border-color: var(--clinical-blue);
+        .sample-item:hover {
+            border-color: var(--brand-blue);
+            transform: translateY(-2px);
         }
 
-        .sample-cell img {
+        .sample-item img {
             width: 100%;
             height: 75px;
             object-fit: cover;
             display: block;
         }
 
-        .sample-tag {
-            font-size: 10px;
-            font-weight: 600;
-            padding: 3px;
+        .sample-label {
+            font-size: 0.72rem;
+            font-weight: 700;
             text-align: center;
-            background: var(--slate-100);
-            color: var(--slate-700);
-            border-top: 1px solid var(--border);
+            padding: 4px;
+            background: #f8fafc;
+            color: var(--text-secondary);
         }
 
-        /* Right Panel Findings Table */
-        .finding-section {
+        /* Friendly Result Display */
+        .result-box {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-banner {
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            text-align: center;
+        }
+
+        .result-banner.healthy {
+            background: var(--success-bg);
+            border: 1px solid var(--success-border);
+            color: var(--success-text);
+        }
+
+        .result-banner.cataract {
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            color: var(--danger-text);
+        }
+
+        .result-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-advice {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-dark);
+            background: #fff;
+            padding: 1rem;
+            border-radius: 10px;
             border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--slate-50);
-            padding: 12px;
-            margin-bottom: 12px;
+            margin-top: 1rem;
+            text-align: left;
         }
 
-        .finding-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .finding-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--slate-500);
-            text-transform: uppercase;
-        }
-
-        .status-pill {
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .status-pill.cataract {
-            background: #fee2e2;
-            color: var(--danger-red);
-            border: 1px solid #fca5a5;
-        }
-
-        .status-pill.normal {
-            background: #dcfce7;
-            color: var(--success-green);
-            border: 1px solid #86efac;
-        }
-
-        .metric-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-
-        .metric-table td {
-            padding: 6px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .metric-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .metric-table td.label {
-            color: var(--slate-600);
-        }
-
-        .metric-table td.val {
-            text-align: right;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
-            color: var(--slate-900);
-        }
-
-        /* Progress Bar */
-        .bar-outer {
-            height: 6px;
-            background: var(--slate-200);
-            border-radius: 3px;
+        .certainty-bar {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 20px;
             overflow: hidden;
-            margin: 6px 0 10px 0;
+            margin: 1rem 0;
         }
 
-        .bar-inner {
+        .certainty-fill {
             height: 100%;
             width: 0%;
-            background: var(--clinical-blue);
-            transition: width 0.4s ease;
+            background: var(--brand-blue);
+            transition: width 0.6s ease;
         }
 
-        /* Technical Specification Audit Table */
-        .audit-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
+        .percent-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 1rem;
         }
 
-        .audit-table th {
-            background: var(--slate-100);
-            text-align: left;
-            padding: 6px 8px;
+        .percent-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.85rem;
+            text-align: center;
+        }
+
+        .percent-card .lbl {
+            font-size: 0.78rem;
+            color: var(--text-muted);
             font-weight: 600;
-            color: var(--slate-700);
-            border-bottom: 1px solid var(--border);
         }
 
-        .audit-table td {
-            padding: 6px 8px;
-            border-bottom: 1px solid var(--border);
-            color: var(--slate-800);
-        }
-
-        .audit-table tr:nth-child(even) {
-            background: var(--slate-50);
-        }
-
-        .audit-pass {
-            color: var(--success-green);
-            font-weight: 600;
+        .percent-card .val {
+            font-size: 1.2rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 2px;
         }
     </style>
 </head>
 <body>
 
     <!-- Header -->
-    <header class="clinic-header">
-        <div class="header-brand">
-            <i class="fa-solid fa-hospital-user"></i>
-            <h1>OPHTHALMIC AI WORKSTATION <span>v2.4 Clinical Edition</span></h1>
-        </div>
+    <header>
+        <div class="header-wrap">
+            <div class="logo-box">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-eye"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>EyeCheck AI</h1>
+                    <p>Easy Cataract & Eye Health Checker</p>
+                </div>
+            </div>
 
-        <div class="patient-bar">
-            <div>MRN: <strong>#OPH-2026-8841</strong></div>
-            <div>Modality: <strong>SLIT-LAMP MICROSCOPY</strong></div>
-            <div>Resolution: <strong>224x224 RGB</strong></div>
+            <div class="accuracy-badge">
+                <i class="fa-solid fa-circle-check"></i>
+                96.5% AI Accuracy Tested
+            </div>
         </div>
     </header>
 
-    <!-- Main Workspace -->
-    <div class="workspace">
-        
-        <!-- Left Panel: DICOM Inspection Viewport -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fa-solid fa-eye-dropper"></i> Slit-Lamp Image Inspection Viewport
-                </div>
-                <span style="font-size: 11px; color: var(--slate-500);">Target Layer: Anterior Segment / Lens</span>
-            </div>
-
-            <div class="card-body">
-                <!-- Mode Tabs -->
-                <div class="tab-bar">
-                    <button class="tab-item active" onclick="switchMode('upload', event)">
-                        <i class="fa-solid fa-folder-open"></i> Upload Exam File
-                    </button>
-                    <button class="tab-item" onclick="switchMode('webcam', event)">
-                        <i class="fa-solid fa-video"></i> Live Slit-Lamp Feed
-                    </button>
-                    <button class="tab-item" onclick="switchMode('samples', event)">
-                        <i class="fa-solid fa-images"></i> Clinical Dataset Samples
-                    </button>
-                </div>
-
-                <!-- Tab 1: Upload File -->
-                <div id="boxUpload">
-                    <div class="clinic-dropzone" onclick="document.getElementById('fileInput').click()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <div style="font-weight: 600; color: var(--slate-700);">Select or Drag Ophthalmic Slit-Lamp Photograph</div>
-                        <div style="font-size: 11px; color: var(--slate-500); margin-top: 4px;">Formats supported: DICOM, PNG, JPG, JPEG (Standardized to 224x224)</div>
-                        <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFile(event)">
-                    </div>
-                </div>
-
-                <!-- Tab 2: Webcam Video -->
-                <div id="boxWebcam" style="display: none;">
-                    <div class="dicom-frame" style="height: 300px;">
-                        <video id="webcamVid" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
-                        <div class="dicom-hud">LIVE SLIT-LAMP STREAM</div>
-                    </div>
-                    <button class="btn-clinic btn-clinic-primary" onclick="captureStreamFrame()">
-                        <i class="fa-solid fa-camera"></i> Capture Video Frame & Run Inference
-                    </button>
-                </div>
-
-                <!-- Tab 3: Real Clinical Samples -->
-                <div id="boxSamples" style="display: none;">
-                    <div style="font-size: 11px; color: var(--slate-600); margin-bottom: 4px;">Select authentic clinical test photograph from Kaggle dataset:</div>
-                    <div class="sample-grid">
-                        {% for img in sample_images %}
-                        <div class="sample-cell" onclick="loadClinicalSample('{{ img.url }}')">
-                            <img src="{{ img.url }}" alt="Real Eye Sample">
-                            <div class="sample-tag">{{ img.label }}</div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Image Viewport Frame -->
-                <div class="dicom-frame" id="imageFrame" style="display: none; margin-top: 10px;">
-                    <img id="viewImg" src="" alt="Selected Exam Photograph">
-                    <div class="dicom-hud" id="hudText">SLIT-LAMP EXAM | MAG: 16X</div>
-                    <div class="dicom-scale">Scale: 100µm / 224px</div>
-                </div>
-
-                <button class="btn-clinic btn-clinic-primary" id="runBtn" onclick="runInference()" style="display: none;">
-                    <i class="fa-solid fa-microscope"></i> Run MobileNetV2 Ocular Inference
-                </button>
+    <!-- 3-Step Guide -->
+    <div class="step-bar">
+        <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-info">
+                <h4>Choose Eye Photo</h4>
+                <p>Upload a file, take a picture, or pick a sample</p>
             </div>
         </div>
+        <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-info">
+                <h4>✨ Auto-Enhance (Optional)</h4>
+                <p>Fixes dark or blurry photos automatically</p>
+            </div>
+        </div>
+        <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-info">
+                <h4>Instant Results</h4>
+                <p>Clear answer with helpful health advice</p>
+            </div>
+        </div>
+    </div>
 
-        <!-- Right Panel: Clinical Findings & Audit Specifications -->
+    <!-- Main Workspace -->
+    <div class="main-workspace">
+        
+        <!-- Left Panel: Input & Auto-Improver Controls -->
         <div class="card">
             <div class="card-header">
                 <div class="card-title">
-                    <i class="fa-solid fa-clipboard-check"></i> Diagnostic Report & Findings
+                    <i class="fa-solid fa-camera"></i> Step 1: Add Your Eye Photo
                 </div>
             </div>
 
-            <div class="card-body">
-                <!-- Result Box -->
-                <div class="finding-section" id="resultCard" style="display: none;">
-                    <div class="finding-header">
-                        <span class="finding-title">Primary Clinical Impression</span>
-                        <span class="status-pill normal" id="statusPill">NORMAL CLEAR LENS</span>
+            <!-- Tabs -->
+            <div class="tab-group">
+                <button class="tab-btn active" onclick="switchInputMode('upload', event)">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload Photo
+                </button>
+                <button class="tab-btn" onclick="switchInputMode('webcam', event)">
+                    <i class="fa-solid fa-video"></i> Use Camera
+                </button>
+                <button class="tab-btn" onclick="switchInputMode('samples', event)">
+                    <i class="fa-solid fa-images"></i> Sample Photos
+                </button>
+            </div>
+
+            <!-- Upload Option -->
+            <div id="uploadTab">
+                <div class="dropzone" onclick="document.getElementById('fileInput').click()">
+                    <i class="fa-solid fa-circle-plus"></i>
+                    <div class="dropzone-text">Click here to choose an eye picture</div>
+                    <div class="dropzone-subtext">Supports PNG, JPG, JPEG photos from your device</div>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelected(event)">
+                </div>
+            </div>
+
+            <!-- Camera Option -->
+            <div id="webcamTab" style="display: none;">
+                <div class="preview-box" id="webcamFrame" style="display: block;">
+                    <video id="webcamVideo" autoplay playsinline></video>
+                </div>
+                <button class="btn-check" onclick="takeWebcamSnapshot()">
+                    <i class="fa-solid fa-camera"></i> Take Snapshot & Check Eye
+                </button>
+            </div>
+
+            <!-- Sample Photos Option -->
+            <div id="samplesTab" style="display: none;">
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Click any sample eye photo to test live:</div>
+                <div class="sample-grid">
+                    {% for img in sample_images %}
+                    <div class="sample-item" onclick="loadSamplePhoto('{{ img.url }}')">
+                        <img src="{{ img.url }}" alt="{{ img.label }}">
+                        <div class="sample-label">{{ img.label }}</div>
                     </div>
+                    {% endfor %}
+                </div>
+            </div>
 
-                    <div style="font-size: 12px; font-weight: 600; color: var(--slate-800);" id="diagHeading">NORMAL VISION</div>
-                    <div style="font-size: 11px; color: var(--slate-500); margin-bottom: 6px;" id="diagSub">Clear Lens — No Nuclear Opacification Detected</div>
-
-                    <div class="bar-outer">
-                        <div class="bar-inner" id="barFill"></div>
+            <!-- Auto-Improver Feature Toggle Switch -->
+            <div class="enhance-box">
+                <div class="enhance-info">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <div class="enhance-text">
+                        <h5>✨ Auto-Enhance Photo</h5>
+                        <p>Improves dark, blurry, or low-contrast photos automatically</p>
                     </div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="enhanceToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
 
-                    <table class="metric-table">
-                        <tr>
-                            <td class="label">Diagnostic Confidence</td>
-                            <td class="val" id="valConf">0.0%</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Nuclear Opacity Probability</td>
-                            <td class="val" id="valCat" style="color: var(--danger-red);">0.0%</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Transparent Lens Probability</td>
-                            <td class="val" id="valNorm" style="color: var(--success-green);">0.0%</td>
-                        </tr>
-                    </table>
+            <!-- Image Preview Box -->
+            <div class="preview-box" id="imagePreviewBox">
+                <img id="previewImageTag" src="" alt="Selected Eye Photo">
+                <div class="enhanced-tag" id="enhancedBadge" style="display: none;"><i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Enhanced</div>
+            </div>
+
+            <button class="btn-check" id="checkEyeBtn" onclick="runEyeCheck()" style="display: none;">
+                <i class="fa-solid fa-circle-play"></i> Check My Eye Now
+            </button>
+        </div>
+
+        <!-- Right Panel: Easy Results & Health Advice -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fa-solid fa-square-poll-vertical"></i> Step 2: Your Health Results
+                </div>
+            </div>
+
+            <!-- Initial Empty State -->
+            <div id="emptyState" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <i class="fa-solid fa-eye-slash" style="font-size: 3rem; margin-bottom: 1rem; color: #cbd5e1;"></i>
+                <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-dark);">No Photo Analyzed Yet</h4>
+                <p style="font-size: 0.85rem; margin-top: 4px;">Choose an eye photo on the left and click "Check My Eye Now" to see your results here.</p>
+            </div>
+
+            <!-- Result Output Container -->
+            <div class="result-box" id="resultBox">
+                <div class="result-banner healthy" id="resultBanner">
+                    <i class="fa-solid fa-circle-check result-icon" id="resultIcon"></i>
+                    <div class="result-title" id="resultTitle">Healthy Clear Eye (No Cataract)</div>
+                    <div style="font-size: 0.88rem; font-weight: 600;" id="certaintyText">98.5% Certainty</div>
+
+                    <div class="certainty-bar">
+                        <div class="certainty-fill" id="certaintyFill"></div>
+                    </div>
                 </div>
 
-                <!-- Technical Specification Tabs -->
-                <div style="font-weight: 700; font-size: 11px; color: var(--slate-500); text-transform: uppercase; margin-bottom: 8px;">
-                    Model Architecture & Fact-Check Verification
+                <div class="result-advice">
+                    <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; color: var(--text-dark);">
+                        <i class="fa-solid fa-user-doctor" style="color: var(--brand-blue);"></i> What This Means:
+                    </div>
+                    <p id="adviceText">Your eye lens appears clear and transparent. No signs of cataract cloudiness were detected in this photo.</p>
                 </div>
 
-                <table class="audit-table">
-                    <thead>
-                        <tr>
-                            <th>Audit Criteria</th>
-                            <th>Specification / Value</th>
-                            <th>Audit Result</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Backbone Neural Net</td>
-                            <td>MobileNetV2 (ImageNet)</td>
-                            <td class="audit-pass">VERIFIED</td>
-                        </tr>
-                        <tr>
-                            <td>Layer Freezing Audit</td>
-                            <td>96.4% Weights Frozen</td>
-                            <td class="audit-pass">PASSED</td>
-                        </tr>
-                        <tr>
-                            <td>Classification Head</td>
-                            <td>82,049 Trainable Weights</td>
-                            <td class="audit-pass">PASSED</td>
-                        </tr>
-                        <tr>
-                            <td>Clinical Dataset Size</td>
-                            <td>1,012 Real Photos (Kaggle)</td>
-                            <td class="audit-pass">VERIFIED</td>
-                        </tr>
-                        <tr>
-                            <td>Data Leakage Audit</td>
-                            <td>0% Overlap (Passed)</td>
-                            <td class="audit-pass">PASSED</td>
-                        </tr>
-                        <tr>
-                            <td>ROC-AUC Score</td>
-                            <td>0.9948 (Near Perfect Separation)</td>
-                            <td class="audit-pass">PASSED</td>
-                        </tr>
-                        <tr>
-                            <td>Validation Accuracy</td>
-                            <td>96.55% Accuracy</td>
-                            <td class="audit-pass">PASSED</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div style="margin-top: 12px; font-size: 11px; color: var(--slate-500); background: var(--slate-100); padding: 8px; border-radius: 4px; border: 1px solid var(--border);">
-                    <i class="fa-solid fa-circle-info" style="color: var(--clinical-blue);"></i> 
-                    <strong>Physician Note:</strong> Screenings with $\ge 50\%$ Nuclear Opacity Risk should be referred for detailed slit-lamp evaluation and phacoemulsification assessment.
+                <div class="percent-grid">
+                    <div class="percent-card">
+                        <div class="lbl">Cataract Risk Score</div>
+                        <div class="val" id="cataractPercentVal" style="color: var(--danger-text);">0.0%</div>
+                    </div>
+                    <div class="percent-card">
+                        <div class="lbl">Clear Lens Score</div>
+                        <div class="val" id="normalPercentVal" style="color: var(--success-text);">0.0%</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -627,110 +720,115 @@
     </div>
 
     <script>
-        let currentFileObj = null;
-        let b64ImageData = null;
-        let streamObj = null;
+        let selectedFileObj = null;
+        let base64ImgData = null;
+        let webcamStreamTrack = null;
 
-        function switchMode(mode, evt) {
-            document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+        function switchInputMode(mode, evt) {
+            document.querySelectorAll('.tab-group .tab-btn').forEach(b => b.classList.remove('active'));
             evt.currentTarget.classList.add('active');
 
-            document.getElementById('boxUpload').style.display = (mode === 'upload') ? 'block' : 'none';
-            document.getElementById('boxWebcam').style.display = (mode === 'webcam') ? 'block' : 'none';
-            document.getElementById('boxSamples').style.display = (mode === 'samples') ? 'block' : 'none';
+            document.getElementById('uploadTab').style.display = (mode === 'upload') ? 'block' : 'none';
+            document.getElementById('webcamTab').style.display = (mode === 'webcam') ? 'block' : 'none';
+            document.getElementById('samplesTab').style.display = (mode === 'samples') ? 'block' : 'none';
 
             if (mode === 'webcam') {
-                startWebcamStream();
+                startWebcam();
             } else {
-                stopWebcamStream();
+                stopWebcam();
             }
         }
 
-        function handleFile(evt) {
+        function handleFileSelected(evt) {
             const file = evt.target.files[0];
             if (file) {
-                currentFileObj = file;
-                b64ImageData = null;
+                selectedFileObj = file;
+                base64ImgData = null;
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('viewImg').src = e.target.result;
-                    document.getElementById('imageFrame').style.display = 'flex';
-                    document.getElementById('runBtn').style.display = 'flex';
+                    document.getElementById('previewImageTag').src = e.target.result;
+                    document.getElementById('imagePreviewBox').style.display = 'block';
+                    document.getElementById('checkEyeBtn').style.display = 'flex';
+                    document.getElementById('enhancedBadge').style.display = 'none';
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function startWebcamStream() {
+        function startWebcam() {
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(s => {
-                        streamObj = s;
-                        document.getElementById('webcamVid').srcObject = s;
+                    .then(stream => {
+                        webcamStreamTrack = stream;
+                        document.getElementById('webcamVideo').srcObject = stream;
                     })
-                    .catch(err => console.log("Stream error: " + err));
+                    .catch(err => alert("Camera error: " + err));
             }
         }
 
-        function stopWebcamStream() {
-            if (streamObj) {
-                streamObj.getTracks().forEach(t => t.stop());
-                streamObj = null;
+        function stopWebcam() {
+            if (webcamStreamTrack) {
+                webcamStreamTrack.getTracks().forEach(t => t.stop());
+                webcamStreamTrack = null;
             }
         }
 
-        function captureStreamFrame() {
-            const vid = document.getElementById('webcamVid');
-            const cvs = document.createElement('canvas');
-            cvs.width = 224;
-            cvs.height = 224;
-            const ctx = cvs.getContext('2d');
-            ctx.drawImage(vid, 0, 0, 224, 224);
+        function takeWebcamSnapshot() {
+            const video = document.getElementById('webcamVideo');
+            const canvas = document.createElement('canvas');
+            canvas.width = 224;
+            canvas.height = 224;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, 224, 224);
 
-            b64ImageData = cvs.toDataURL('image/jpeg');
-            currentFileObj = null;
+            base64ImgData = canvas.toDataURL('image/jpeg');
+            selectedFileObj = null;
 
-            document.getElementById('viewImg').src = b64ImageData;
-            document.getElementById('imageFrame').style.display = 'flex';
-            document.getElementById('runBtn').style.display = 'flex';
+            document.getElementById('previewImageTag').src = base64ImgData;
+            document.getElementById('imagePreviewBox').style.display = 'block';
+            document.getElementById('checkEyeBtn').style.display = 'flex';
 
-            runInference();
+            runEyeCheck();
         }
 
-        function loadClinicalSample(url) {
-            document.getElementById('viewImg').src = url;
-            document.getElementById('imageFrame').style.display = 'flex';
-            document.getElementById('runBtn').style.display = 'flex';
+        function loadSamplePhoto(url) {
+            document.getElementById('previewImageTag').src = url;
+            document.getElementById('imagePreviewBox').style.display = 'block';
+            document.getElementById('checkEyeBtn').style.display = 'flex';
 
             const img = new Image();
             img.crossOrigin = "Anonymous";
             img.onload = function() {
-                const cvs = document.createElement('canvas');
-                cvs.width = 224;
-                cvs.height = 224;
-                const ctx = cvs.getContext('2d');
+                const canvas = document.createElement('canvas');
+                canvas.width = 224;
+                canvas.height = 224;
+                const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, 224, 224);
-                b64ImageData = cvs.toDataURL('image/jpeg');
-                currentFileObj = null;
-                runInference();
+                base64ImgData = canvas.toDataURL('image/jpeg');
+                selectedFileObj = null;
+                runEyeCheck();
             };
             img.src = url;
         }
 
-        async function runInference() {
-            document.getElementById('resultCard').style.display = 'none';
+        async function runEyeCheck() {
+            const shouldEnhance = document.getElementById('enhanceToggle').checked;
 
             let formData = new FormData();
             let bodyObj = {};
             let isJson = false;
 
-            if (currentFileObj) {
-                formData.append('file', currentFileObj);
-            } else if (b64ImageData) {
-                bodyObj = JSON.stringify({ image_base64: b64ImageData });
+            if (selectedFileObj) {
+                formData.append('file', selectedFileObj);
+                formData.append('auto_enhance', shouldEnhance ? 'true' : 'false');
+            } else if (base64ImgData) {
+                bodyObj = JSON.stringify({
+                    image_base64: base64ImgData,
+                    auto_enhance: shouldEnhance
+                });
                 isJson = true;
             } else {
-                alert("Please select an eye photograph first.");
+                alert("Please select or upload an eye picture first!");
                 return;
             }
 
@@ -743,37 +841,45 @@
 
                 const data = await res.json();
                 if (data.error) {
-                    alert("API Error: " + data.error);
+                    alert("Error: " + data.error);
                     return;
                 }
 
-                const pill = document.getElementById('statusPill');
-                const head = document.getElementById('diagHeading');
-                const sub = document.getElementById('diagSub');
-
-                if (data.diagnosis.includes("CATARACT")) {
-                    pill.className = "status-pill cataract";
-                    pill.innerText = "CATARACT DETECTED";
-                    head.innerText = "CATARACT DETECTED";
-                    sub.innerText = "High Risk — Lens Opacification Identified";
-                    document.getElementById('barFill').style.background = "var(--danger-red)";
+                // If auto-enhanced, update preview image with improved version
+                if (data.is_auto_enhanced && data.enhanced_preview_b64) {
+                    document.getElementById('previewImageTag').src = data.enhanced_preview_b64;
+                    document.getElementById('enhancedBadge').style.display = 'block';
                 } else {
-                    pill.className = "status-pill normal";
-                    pill.innerText = "NORMAL CLEAR LENS";
-                    head.innerText = "NORMAL CLEAR VISION";
-                    sub.innerText = "Healthy Transparent Lens — No Opacity Detected";
-                    document.getElementById('barFill').style.background = "var(--success-green)";
+                    document.getElementById('enhancedBadge').style.display = 'none';
                 }
 
-                document.getElementById('valConf').innerText = data.confidence + '%';
-                document.getElementById('valCat').innerText = data.cataract_probability + '%';
-                document.getElementById('valNorm').innerText = data.normal_probability + '%';
-                document.getElementById('barFill').style.width = data.confidence + '%';
+                // Render Results
+                document.getElementById('emptyState').style.display = 'none';
+                
+                const banner = document.getElementById('resultBanner');
+                const icon = document.getElementById('resultIcon');
+                
+                if (data.diagnosis.includes("Healthy") || data.diagnosis.includes("Clear")) {
+                    banner.className = "result-banner healthy";
+                    icon.className = "fa-solid fa-circle-check result-icon";
+                } else {
+                    banner.className = "result-banner cataract";
+                    icon.className = "fa-solid fa-circle-exclamation result-icon";
+                }
 
-                document.getElementById('resultCard').style.display = 'block';
+                document.getElementById('resultTitle').innerText = data.diagnosis;
+                document.getElementById('certaintyText').innerText = data.confidence + '% Certainty';
+                document.getElementById('certaintyFill').style.width = data.confidence + '%';
+                document.getElementById('certaintyFill').style.background = data.status_color;
+
+                document.getElementById('adviceText').innerText = data.user_advice;
+                document.getElementById('cataractPercentVal').innerText = data.cataract_probability + '%';
+                document.getElementById('normalPercentVal').innerText = data.normal_probability + '%';
+
+                document.getElementById('resultBox').style.display = 'block';
 
             } catch (err) {
-                console.error("Inference Error:", err);
+                console.error("Eye Check Error:", err);
             }
         }
     </script>

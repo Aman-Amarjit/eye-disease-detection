@@ -7,6 +7,7 @@ from PIL import Image
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from torchvision import transforms
 from model import get_model
+from image_enhancer import auto_enhance_eye_image
 
 app = Flask(__name__)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -43,7 +44,7 @@ def index():
                 for f in files:
                     sample_images.append({
                         "filename": f,
-                        "label": cls.capitalize(),
+                        "label": "Clear Eye" if cls == "normal" else "Cataract Eye",
                         "url": f"/dataset_img/test/{cls}/{f}"
                     })
     return render_template("index.html", sample_images=sample_images)
@@ -59,16 +60,20 @@ def predict():
         load_ai_model()
 
     img = None
+    is_auto_enhanced = False
 
     try:
-        # 1. Check for file upload in multipart/form-data
+        # Check if user requested auto-enhancement
+        json_data = request.get_json(silent=True) or {}
+        should_enhance = request.form.get("auto_enhance") == "true" or json_data.get("auto_enhance") is True
+
+        # 1. Check for file upload
         if "file" in request.files and request.files["file"].filename != "":
             file = request.files["file"]
             img = Image.open(file.stream).convert("RGB")
         
-        # 2. Check for base64 payload in JSON or Form
+        # 2. Check for base64 payload
         else:
-            json_data = request.get_json(silent=True) or {}
             b64_str = json_data.get("image_base64") or request.form.get("image_base64")
             if b64_str:
                 if "," in b64_str:
@@ -77,7 +82,17 @@ def predict():
                 img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
 
         if img is None:
-            return jsonify({"error": "No valid image provided"}), 400
+            return jsonify({"error": "Please select or upload an eye photo."}), 400
+
+        # Apply Auto-Improver (CLAHE Medical Enhancement) if enabled
+        if should_enhance:
+            img = auto_enhance_eye_image(img)
+            is_auto_enhanced = True
+
+        # Prepare base64 version of final image for visual preview
+        buffered = io.BytesIO()
+        img.save(buffered, format="JPEG")
+        preview_b64 = "data:image/jpeg;base64," + base64.b64encode(buffered.getvalue()).decode("utf-8")
 
         input_tensor = transform(img).unsqueeze(0).to(device)
 
@@ -90,46 +105,33 @@ def predict():
         cataract_score = 1.0 - score
 
         if cataract_score >= 0.5:
-            diagnosis = "CATARACT DETECTED"
+            result_title = "Cataract Cloudiness Detected"
             confidence = cataract_score * 100
-            severity = "High Risk — Lens Opacification Identified"
-            color = "#ef4444"
+            user_advice = "Lens cloudiness was detected in this photo. We recommend showing this photo to an eye doctor (Ophthalmologist) for a simple checkup."
+            badge_color = "#dc2626"
+            badge_icon = "fa-circle-exclamation"
         else:
-            diagnosis = "NORMAL CLEAR VISION"
+            result_title = "Healthy Clear Eye (No Cataract)"
             confidence = normal_score * 100
-            severity = "Healthy Transparent Lens — No Opacity Identified"
-            color = "#16a34a"
+            user_advice = "Your lens appears clear and transparent. No signs of cataract cloudiness were detected in this photo."
+            badge_color = "#16a34a"
+            badge_icon = "fa-circle-check"
 
         return jsonify({
-            "diagnosis": diagnosis,
-            "confidence": round(confidence, 2),
-            "cataract_probability": round(cataract_score * 100, 2),
-            "normal_probability": round(normal_score * 100, 2),
-            "severity_level": severity,
-            "status_color": color
+            "diagnosis": result_title,
+            "confidence": round(confidence, 1),
+            "cataract_probability": round(cataract_score * 100, 1),
+            "normal_probability": round(normal_score * 100, 1),
+            "user_advice": user_advice,
+            "status_color": badge_color,
+            "badge_icon": badge_icon,
+            "is_auto_enhanced": is_auto_enhanced,
+            "enhanced_preview_b64": preview_b64
         })
 
     except Exception as e:
         print(f"❌ Prediction API Error: {e}")
         return jsonify({"error": str(e)}), 500
-
-@app.route("/api/train", methods=["POST"])
-def run_training_api():
-    try:
-        print("⚡ Triggering model training pipeline via API...")
-        train_model(epochs=5, batch_size=16)
-        load_ai_model()
-        return jsonify({"status": "success", "message": "Training completed! Model updated."})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route("/api/metrics", methods=["GET"])
-def get_metrics():
-    # Return metrics image paths or cached metrics
-    return jsonify({
-        "confusion_matrix_url": "/static/confusion_matrix.png" if os.path.exists("static/confusion_matrix.png") else None,
-        "training_history_url": "/static/training_history.png" if os.path.exists("static/training_history.png") else None
-    })
 
 if __name__ == "__main__":
     os.makedirs("templates", exist_ok=True)
