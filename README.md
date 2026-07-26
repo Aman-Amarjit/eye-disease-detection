@@ -37,9 +37,9 @@ The model pipeline underwent rigorous empirical verification (`factcheck_train.p
 | **1. Framework & Hardware** | **VERIFIED** | PyTorch `2.13.0+cu130` execution engine. |
 | **2. Dataset Integrity** | **PASSED** | **1,012 Authentic Clinical Images** (809 Train, 203 Test). **$0\%$ Data Leakage**. |
 | **3. Parameter Freezing Audit** | **PASSED** | $2,223,872$ frozen backbone weights ($96.4\%$), $82,049$ trainable head weights ($3.6\%$). |
-| **4. Convergence Audit** | **PASSED** | BCE Loss reduced from $0.3085 \to 0.1132$ ($63.3\%$ loss reduction over 10 epochs). |
-| **5. Test Evaluation Metrics** | **PASSED** | **Accuracy:** $\mathbf{96.55\%}$<br>**ROC-AUC:** $\mathbf{0.9948}$<br>**Precision:** $\mathbf{93.44\%}$<br>**Recall:** $\mathbf{95.00\%}$ |
-| **6. Sample Inference Check** | **PASSED** | Real Cataract Sample $\to$ `Cataract Detected` ($99.96\%$ Confidence)<br>Real Normal Sample $\to$ `Normal Vision` ($94.93\%$ Confidence) |
+| **4. Convergence Audit** | **PASSED** | BCE Loss reduced from $0.2717 \to 0.1264$ ($53.5\%$ loss reduction over 10 epochs). |
+| **5. Test Evaluation Metrics** | **PASSED** | **Accuracy:** $\mathbf{97.04\%}$<br>**Recall:** $\mathbf{100.00\%}$ ($0$ Missed Cataracts)<br>**ROC-AUC:** $\mathbf{0.9887}$<br>**Precision:** $\mathbf{90.91\%}$ |
+| **6. Sample Inference Check** | **PASSED** | Real Cataract Sample $\to$ `Cataract Detected` ($100.00\%$ Confidence)<br>Real Normal Sample $\to$ `Normal Vision` ($98.52\%$ Confidence) |
 
 ### 📈 Confusion Matrix (Held-out 120 Clinical Test Photos)
 
