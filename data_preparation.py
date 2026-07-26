@@ -75,6 +75,11 @@ def split_and_preprocess_dataset(base_dir="dataset", train_ratio=0.8, img_size=(
     test_count = 0
     
     print("\n🔄 Processing & Splitting Dataset (80% Train / 20% Test)...")
+
+    # Ensure target output directories exist
+    for cls in classes:
+        os.makedirs(os.path.join(processed_dir, "train", cls), exist_ok=True)
+        os.makedirs(os.path.join(processed_dir, "test", cls), exist_ok=True)
     
     for cls in classes:
         cls_raw_path = os.path.join(raw_dir, cls)

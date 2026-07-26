@@ -40,23 +40,21 @@ def run_factchecked_training():
     train_dir = os.path.join(base_data_dir, "train")
     test_dir = os.path.join(base_data_dir, "test")
 
-    train_files = {}
-    test_files = {}
+    train_files = set()
+    test_files = set()
     for cls in ["normal", "cataract"]:
-        train_cls_dir = os.path.join(train_dir, cls)
-        test_cls_dir = os.path.join(test_dir, cls)
-        train_files[cls] = set(os.listdir(train_cls_dir)) if os.path.exists(train_cls_dir) else set()
-        test_files[cls] = set(os.listdir(test_cls_dir)) if os.path.exists(test_cls_dir) else set()
+        tr_p = os.path.join(train_dir, cls)
+        te_p = os.path.join(test_dir, cls)
+        if os.path.exists(tr_p):
+            train_files.update([f"{cls}/{f}" for f in os.listdir(tr_p)])
+        if os.path.exists(te_p):
+            test_files.update([f"{cls}/{f}" for f in os.listdir(te_p)])
 
-    # Data Leak Test: Intersection of Train and Test file names
-    total_train = sum(len(f) for f in train_files.values())
-    total_test = sum(len(f) for f in test_files.values())
-    
-    overlap = {cls: train_files[cls].intersection(test_files[cls]) for cls in ["normal", "cataract"]}
-    has_leak = any(len(o) > 0 for o in overlap.values())
+    overlap = train_files.intersection(test_files)
+    has_leak = len(overlap) > 0
 
-    print(f"  • Train Set Size:     {total_train} images (Normal: {len(train_files['normal'])}, Cataract: {len(train_files['cataract'])})")
-    print(f"  • Test Set Size:      {total_test} images (Normal: {len(test_files['normal'])}, Cataract: {len(test_files['cataract'])})")
+    print(f"  • Train Set Size:     {len(train_files)} images")
+    print(f"  • Test Set Size:      {len(test_files)} images")
     print(f"  • Data Leak Audit:    {'❌ FAIL - Overlapping images found!' if has_leak else '✅ PASSED - 0% Train/Test Data Leakage'}")
 
     # Data Augmentation & Normalization Pipeline
