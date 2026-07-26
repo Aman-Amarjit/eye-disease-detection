@@ -58,18 +58,26 @@ def predict():
     if model is None:
         load_ai_model()
 
-    if "file" not in request.files and not request.json.get("image_base64"):
-        return jsonify({"error": "No image uploaded"}), 400
+    img = None
 
     try:
-        if "file" in request.files:
+        # 1. Check for file upload in multipart/form-data
+        if "file" in request.files and request.files["file"].filename != "":
             file = request.files["file"]
             img = Image.open(file.stream).convert("RGB")
+        
+        # 2. Check for base64 payload in JSON or Form
         else:
-            # Base64 string from webcam / canvas
-            b64_data = request.json.get("image_base64").split(",")[1]
-            img_bytes = base64.b64decode(b64_data)
-            img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+            json_data = request.get_json(silent=True) or {}
+            b64_str = json_data.get("image_base64") or request.form.get("image_base64")
+            if b64_str:
+                if "," in b64_str:
+                    b64_str = b64_str.split(",")[1]
+                img_bytes = base64.b64decode(b64_str)
+                img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+
+        if img is None:
+            return jsonify({"error": "No valid image provided"}), 400
 
         input_tensor = transform(img).unsqueeze(0).to(device)
 
@@ -84,13 +92,13 @@ def predict():
         if cataract_score >= 0.5:
             diagnosis = "CATARACT DETECTED"
             confidence = cataract_score * 100
-            severity = "High Risk - Ocular Clouding" if confidence > 80 else "Moderate Cloudiness"
-            color = "#f43f5e"
+            severity = "High Risk — Lens Opacification Identified"
+            color = "#ef4444"
         else:
             diagnosis = "NORMAL CLEAR VISION"
             confidence = normal_score * 100
-            severity = "Healthy Transparent Lens"
-            color = "#10b981"
+            severity = "Healthy Transparent Lens — No Opacity Identified"
+            color = "#16a34a"
 
         return jsonify({
             "diagnosis": diagnosis,
@@ -102,6 +110,7 @@ def predict():
         })
 
     except Exception as e:
+        print(f"❌ Prediction API Error: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route("/api/train", methods=["POST"])
