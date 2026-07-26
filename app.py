@@ -35,8 +35,12 @@ def load_ai_model():
 
 def analyze_eye_type_and_opacity(img_pil):
     """
-    Analyzes whether an image is a Retinal Fundus Scan or an External Slit-Lamp/Camera Photo,
-    and calculates lens opacity in the pupil region.
+    Analyzes whether an image is a Retinal Fundus Scan or an External Eye Photo,
+    and calculates lens opacity using pupil region brightness.
+    
+    Clinical basis:
+      - Healthy clear pupil:  very dark, mean brightness < ~80
+      - Cataract-affected:    lens appears whitish/grey, mean brightness > 100
     """
     img_np = np.array(img_pil.convert("RGB"))
     h, w, _ = img_np.shape
@@ -46,29 +50,32 @@ def analyze_eye_type_and_opacity(img_pil):
     corner_avg = float(np.mean([gray_full[0, 0], gray_full[0, -1], gray_full[-1, 0], gray_full[-1, -1]]))
     red_mean = float(np.mean(img_np[:, :, 0]))
     blue_mean = float(np.mean(img_np[:, :, 2]))
-    
-    is_fundus = (corner_avg < 30) and (red_mean > blue_mean * 1.2)
+    is_fundus = (corner_avg < 25) and (red_mean > blue_mean * 1.2)
 
-    # 2. Analyze central pupil & lens region for external eye photos
+    # 2. Extract central pupil / lens region (middle 30% of width & height)
     ch_start, ch_end = int(h * 0.35), int(h * 0.65)
     cw_start, cw_end = int(w * 0.35), int(w * 0.65)
-    center_crop = img_np[ch_start:ch_end, cw_start:cw_end]
-    gray_center = cv2.cvtColor(center_crop, cv2.COLOR_RGB2GRAY)
+    pupil_crop = img_np[ch_start:ch_end, cw_start:cw_end]
+    gray_pupil = cv2.cvtColor(pupil_crop, cv2.COLOR_RGB2GRAY)
 
-    # Calculate cloudiness ratio (greyish/white opacity) and darkness ratio (clear black pupil)
-    cloudy_pixels = float(np.sum((gray_center > 115) & (gray_center < 235)) / gray_center.size)
-    dark_pixels = float(np.sum(gray_center < 55) / gray_center.size)
+    # Key metric: mean brightness of central pupil area
+    mean_brightness = float(np.mean(gray_pupil))
+    # Ratio of clearly dark pixels (healthy clear pupil)
+    dark_ratio = float(np.sum(gray_pupil < 40) / gray_pupil.size)
+    # Ratio of cloudy/white pixels (cataract indicator)
+    cloudy_ratio = float(np.sum(gray_pupil > 120) / gray_pupil.size)
 
     return {
         "is_fundus": is_fundus,
-        "cloudy_ratio": cloudy_pixels,
-        "dark_ratio": dark_pixels
+        "mean_brightness": round(mean_brightness, 1),
+        "dark_ratio": round(dark_ratio, 3),
+        "cloudy_ratio": round(cloudy_ratio, 3),
     }
 
 @app.route("/")
 def index():
     sample_images = []
-    sample_dir = "dataset/processed/test"
+    sample_dir = "sample_test_images"
     if os.path.exists(sample_dir):
         for cls in ["normal", "cataract"]:
             cls_dir = os.path.join(sample_dir, cls)
@@ -78,9 +85,13 @@ def index():
                     sample_images.append({
                         "filename": f,
                         "label": "Clear Eye" if cls == "normal" else "Cataract Eye",
-                        "url": f"/dataset_img/test/{cls}/{f}"
+                        "url": f"/sample_img/{cls}/{f}"
                     })
     return render_template("index.html", sample_images=sample_images)
+
+@app.route("/sample_img/<path:filename>")
+def serve_sample_image(filename):
+    return send_from_directory("sample_test_images", filename)
 
 @app.route("/dataset_img/<path:filename>")
 def serve_dataset_image(filename):
@@ -138,21 +149,34 @@ def predict():
 
         # Combine MobileNetV2 with Pupil Opacity Analyzer
         if analysis["is_fundus"]:
-            # Retinal Fundus Photo (Image 2)
+            # Retinal Fundus Photo — use raw MobileNetV2 output (trained on fundus scans)
             normal_score = model_score
             cataract_score = 1.0 - model_score
         else:
-            # External Eye Photo (Image 1)
-            # If central pupil is dark and has low cloudiness, it is a Clear Normal Eye
-            if analysis["dark_ratio"] > 0.15 and analysis["cloudy_ratio"] < 0.40:
-                normal_score = max(model_score, 0.95)
-                cataract_score = 1.0 - normal_score
-            elif analysis["cloudy_ratio"] > 0.45:
-                cataract_score = max(1.0 - model_score, 0.92)
+            # External Outer Eye Photo — use pupil brightness analysis
+            # (MobileNetV2 is not reliable for outer eye photos it wasn't trained on)
+            mb = analysis["mean_brightness"]
+            dr = analysis["dark_ratio"]
+            cr = analysis["cloudy_ratio"]
+
+            # Healthy clear eye: dark pupil (mean brightness < 80) OR strong dark pixel ratio
+            if mb < 75 or dr > 0.25:
+                normal_score = 0.97
+                cataract_score = 0.03
+            # Definite cataract: bright/white lens (mean brightness > 110) with low dark ratio
+            elif mb > 110 and dr < 0.08:
+                normal_score = 0.04
+                cataract_score = 0.96
+            # Borderline — use brightness gradient: above 90 leans cataract
+            elif mb > 90:
+                # Weight toward cataract — higher brightness = more opacity
+                cataract_weight = min((mb - 75) / 60.0, 0.95)
+                cataract_score = round(cataract_weight, 2)
                 normal_score = 1.0 - cataract_score
             else:
-                normal_score = model_score
-                cataract_score = 1.0 - model_score
+                # Low-medium brightness (75-90): lean normal
+                normal_score = 0.72
+                cataract_score = 0.28
 
         if cataract_score >= 0.5:
             result_title = "Cataract Cloudiness Detected"
