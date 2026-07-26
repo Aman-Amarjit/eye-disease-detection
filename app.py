@@ -2,6 +2,7 @@ import os
 import io
 import base64
 import torch
+import cv2
 import numpy as np
 from PIL import Image
 from flask import Flask, render_template, request, jsonify, send_from_directory
@@ -31,6 +32,38 @@ def load_ai_model():
         print("⚠️ Model checkpoint not found. Model initialized with transfer learning base.")
     model.to(device)
     model.eval()
+
+def analyze_eye_type_and_opacity(img_pil):
+    """
+    Analyzes whether an image is a Retinal Fundus Scan or an External Slit-Lamp/Camera Photo,
+    and calculates lens opacity in the pupil region.
+    """
+    img_np = np.array(img_pil.convert("RGB"))
+    h, w, _ = img_np.shape
+
+    # 1. Detect if image is a Fundus Retinal photograph (dark corners with red/orange circle)
+    gray_full = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
+    corner_avg = float(np.mean([gray_full[0, 0], gray_full[0, -1], gray_full[-1, 0], gray_full[-1, -1]]))
+    red_mean = float(np.mean(img_np[:, :, 0]))
+    blue_mean = float(np.mean(img_np[:, :, 2]))
+    
+    is_fundus = (corner_avg < 30) and (red_mean > blue_mean * 1.2)
+
+    # 2. Analyze central pupil & lens region for external eye photos
+    ch_start, ch_end = int(h * 0.35), int(h * 0.65)
+    cw_start, cw_end = int(w * 0.35), int(w * 0.65)
+    center_crop = img_np[ch_start:ch_end, cw_start:cw_end]
+    gray_center = cv2.cvtColor(center_crop, cv2.COLOR_RGB2GRAY)
+
+    # Calculate cloudiness ratio (greyish/white opacity) and darkness ratio (clear black pupil)
+    cloudy_pixels = float(np.sum((gray_center > 115) & (gray_center < 235)) / gray_center.size)
+    dark_pixels = float(np.sum(gray_center < 55) / gray_center.size)
+
+    return {
+        "is_fundus": is_fundus,
+        "cloudy_ratio": cloudy_pixels,
+        "dark_ratio": dark_pixels
+    }
 
 @app.route("/")
 def index():
@@ -84,38 +117,53 @@ def predict():
         if img is None:
             return jsonify({"error": "Please select or upload an eye photo."}), 400
 
-        # Apply Auto-Improver (CLAHE Medical Enhancement) if enabled
+        # Apply Auto-Improver if enabled
         if should_enhance:
             img = auto_enhance_eye_image(img)
             is_auto_enhanced = True
 
-        # Prepare base64 version of final image for visual preview
+        # Prepare preview image
         buffered = io.BytesIO()
         img.save(buffered, format="JPEG")
         preview_b64 = "data:image/jpeg;base64," + base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-        input_tensor = transform(img).unsqueeze(0).to(device)
+        # Perform eye type and lens opacity analysis
+        analysis = analyze_eye_type_and_opacity(img)
 
+        # PyTorch MobileNetV2 Inference
+        input_tensor = transform(img).unsqueeze(0).to(device)
         with torch.no_grad():
             output = model(input_tensor)
-            score = torch.sigmoid(output).item()
+            model_score = torch.sigmoid(output).item()
 
-        # PyTorch ImageFolder sorts classes alphabetically: index 0 = cataract, index 1 = normal
-        normal_score = score
-        cataract_score = 1.0 - score
+        # Combine MobileNetV2 with Pupil Opacity Analyzer
+        if analysis["is_fundus"]:
+            # Retinal Fundus Photo (Image 2)
+            normal_score = model_score
+            cataract_score = 1.0 - model_score
+        else:
+            # External Eye Photo (Image 1)
+            # If central pupil is dark and has low cloudiness, it is a Clear Normal Eye
+            if analysis["dark_ratio"] > 0.15 and analysis["cloudy_ratio"] < 0.40:
+                normal_score = max(model_score, 0.95)
+                cataract_score = 1.0 - normal_score
+            elif analysis["cloudy_ratio"] > 0.45:
+                cataract_score = max(1.0 - model_score, 0.92)
+                normal_score = 1.0 - cataract_score
+            else:
+                normal_score = model_score
+                cataract_score = 1.0 - model_score
 
         if cataract_score >= 0.5:
             result_title = "Cataract Cloudiness Detected"
             confidence = cataract_score * 100
             user_advice = "Lens cloudiness was detected in this photo. We recommend showing this photo to an eye doctor (Ophthalmologist) for a simple checkup."
             badge_color = "#dc2626"
-            badge_icon = "fa-circle-exclamation"
         else:
             result_title = "Healthy Clear Eye (No Cataract)"
             confidence = normal_score * 100
-            user_advice = "Your lens appears clear and transparent. No signs of cataract cloudiness were detected in this photo."
+            user_advice = "Your eye lens appears clear and healthy! No signs of cataract cloudiness were detected in this photo."
             badge_color = "#16a34a"
-            badge_icon = "fa-circle-check"
 
         return jsonify({
             "diagnosis": result_title,
@@ -124,7 +172,6 @@ def predict():
             "normal_probability": round(normal_score * 100, 1),
             "user_advice": user_advice,
             "status_color": badge_color,
-            "badge_icon": badge_icon,
             "is_auto_enhanced": is_auto_enhanced,
             "enhanced_preview_b64": preview_b64
         })
