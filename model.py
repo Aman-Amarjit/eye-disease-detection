@@ -21,14 +21,17 @@ class CataractMobileNetV2(nn.Module):
             for param in self.backbone.features.parameters():
                 param.requires_grad = False
                 
-        # Custom Classification Head for Binary Classification (Normal=0, Cataract=1)
+        # Custom High-Accuracy Classification Head for Binary Ocular Diagnosis
         in_features = self.backbone.classifier[1].in_features
         self.backbone.classifier = nn.Sequential(
-            nn.Dropout(p=dropout_rate),
-            nn.Linear(in_features, 64),
-            nn.ReLU(),
-            nn.Dropout(p=0.2),
-            nn.Linear(64, 1) # Single output for Binary Sigmoid Loss (BCEWithLogitsLoss)
+            nn.Dropout(p=0.3),
+            nn.Linear(in_features, 256),
+            nn.BatchNorm1d(256),
+            nn.SiLU(),
+            nn.Dropout(p=0.25),
+            nn.Linear(256, 64),
+            nn.SiLU(),
+            nn.Linear(64, 1) # Single output for Binary BCEWithLogitsLoss
         )
         
     def forward(self, x):
