@@ -128,11 +128,6 @@ def predict():
         if img is None:
             return jsonify({"error": "Please select or upload an eye photo."}), 400
 
-        # Apply Auto-Improver if enabled
-        if should_enhance:
-            img = auto_enhance_eye_image(img)
-            is_auto_enhanced = True
-
         # Prepare preview image
         buffered = io.BytesIO()
         img.save(buffered, format="JPEG")
@@ -173,26 +168,35 @@ def predict():
                 cataract_score = model_cataract_score
                 normal_score = 1.0 - cataract_score
 
-        if cataract_score >= 0.5:
+        # Check for Uncertain / Inconclusive scan (borderline confidence 45% - 55%)
+        if 0.45 <= cataract_score <= 0.55:
+            result_title = "Uncertain / Inconclusive Scan"
+            confidence = round(max(cataract_score, normal_score) * 100, 1)
+            user_advice = "The image focus or lighting is ambiguous. Please retake a clear, well-lit eye photo or consult an eye doctor (Ophthalmologist) for a routine examination."
+            badge_color = "#d97706"
+            result_type = "uncertain"
+        elif cataract_score > 0.55:
             result_title = "Cataract Cloudiness Detected"
-            confidence = cataract_score * 100
+            confidence = round(cataract_score * 100, 1)
             user_advice = "Lens cloudiness was detected in this photo. We recommend showing this photo to an eye doctor (Ophthalmologist) for a simple checkup."
             badge_color = "#dc2626"
+            result_type = "cataract"
         else:
             result_title = "Healthy Clear Eye (No Cataract)"
-            confidence = normal_score * 100
+            confidence = round(normal_score * 100, 1)
             user_advice = "Your eye lens appears clear and healthy! No signs of cataract cloudiness were detected in this photo."
             badge_color = "#16a34a"
+            result_type = "healthy"
 
         return jsonify({
             "diagnosis": result_title,
-            "confidence": round(confidence, 1),
+            "confidence": confidence,
             "cataract_probability": round(cataract_score * 100, 1),
             "normal_probability": round(normal_score * 100, 1),
-            "user_advice": user_advice,
             "status_color": badge_color,
-            "is_auto_enhanced": is_auto_enhanced,
-            "enhanced_preview_b64": preview_b64
+            "result_type": result_type,
+            "user_advice": user_advice,
+            "preview_b64": preview_b64
         })
 
     except Exception as e:

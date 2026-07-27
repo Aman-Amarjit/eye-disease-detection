@@ -375,6 +375,12 @@
             color: var(--danger-text);
         }
 
+        .result-card.uncertain {
+            background: #fffbe6;
+            border: 1px solid #fef08a;
+            color: #92400e;
+        }
+
         .result-header {
             display: flex;
             align-items: center;
@@ -457,17 +463,7 @@
                 <img id="previewImg" src="" alt="Selected Eye Picture">
             </div>
 
-            <!-- Auto-Enhance Switch -->
-            <div class="enhance-bar">
-                <div class="enhance-info">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <span>Auto-Fix Dark / Low Contrast Photos</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="enhanceToggle" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
+
 
             <!-- Main Check Button -->
             <button class="btn-check" id="btnCheckNow" onclick="runCheck()" style="display: none;">
@@ -598,19 +594,15 @@
         }
 
         async function runCheck() {
-            const shouldEnhance = document.getElementById('enhanceToggle').checked;
-
             let formData = new FormData();
             let bodyData = {};
             let isJson = false;
 
             if (fileObject) {
                 formData.append('file', fileObject);
-                formData.append('auto_enhance', shouldEnhance ? 'true' : 'false');
             } else if (base64Image) {
                 bodyData = JSON.stringify({
-                    image_base64: base64Image,
-                    auto_enhance: shouldEnhance
+                    image_base64: base64Image
                 });
                 isJson = true;
             } else {
@@ -631,14 +623,13 @@
                     return;
                 }
 
-                if (data.is_auto_enhanced && data.enhanced_preview_b64) {
-                    document.getElementById('previewImg').src = data.enhanced_preview_b64;
-                }
-
                 const card = document.getElementById('resultCard');
                 const icon = document.getElementById('resIcon');
 
-                if (data.diagnosis.includes("Healthy") || data.diagnosis.includes("Clear")) {
+                if (data.result_type === "uncertain" || data.diagnosis.includes("Uncertain")) {
+                    card.className = "result-card uncertain";
+                    icon.className = "fa-solid fa-triangle-exclamation";
+                } else if (data.result_type === "healthy" || data.diagnosis.includes("Healthy")) {
                     card.className = "result-card healthy";
                     icon.className = "fa-solid fa-circle-check";
                 } else {
