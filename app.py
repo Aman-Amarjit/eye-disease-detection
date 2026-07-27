@@ -145,38 +145,33 @@ def predict():
         input_tensor = transform(img).unsqueeze(0).to(device)
         with torch.no_grad():
             output = model(input_tensor)
-            model_score = torch.sigmoid(output).item()
+            # PyTorch target mapping: 1.0 = Cataract, 0.0 = Normal
+            sig = torch.sigmoid(output).item()
+            model_cataract_score = sig
 
         # Combine MobileNetV2 with Pupil Opacity Analyzer
         if analysis["is_fundus"]:
-            # Retinal Fundus Photo — use raw MobileNetV2 output (trained on fundus scans)
-            normal_score = model_score
-            cataract_score = 1.0 - model_score
+            # Retinal Fundus Photo — use weighted PyTorch MobileNetV2 prediction
+            cataract_score = model_cataract_score
+            normal_score = 1.0 - cataract_score
         else:
-            # External Outer Eye Photo — use pupil brightness analysis
-            # (MobileNetV2 is not reliable for outer eye photos it wasn't trained on)
+            # External Outer Eye Photo — combine model score with pupil brightness/opacity metrics
             mb = analysis["mean_brightness"]
             dr = analysis["dark_ratio"]
             cr = analysis["cloudy_ratio"]
 
-            # Healthy clear eye: dark pupil (mean brightness < 80) OR strong dark pixel ratio
-            if mb < 75 or dr > 0.25:
-                normal_score = 0.97
-                cataract_score = 0.03
-            # Definite cataract: bright/white lens (mean brightness > 110) with low dark ratio
-            elif mb > 110 and dr < 0.08:
-                normal_score = 0.04
-                cataract_score = 0.96
-            # Borderline — use brightness gradient: above 90 leans cataract
-            elif mb > 90:
-                # Weight toward cataract — higher brightness = more opacity
-                cataract_weight = min((mb - 75) / 60.0, 0.95)
-                cataract_score = round(cataract_weight, 2)
+            # Definite cataract if lens is whitish/grey (mb > 95 or cr > 0.18) OR model_cataract_score > 0.40
+            if mb > 95 or cr > 0.18 or model_cataract_score > 0.40:
+                cataract_score = max(model_cataract_score, 0.85 if mb > 105 else 0.70)
                 normal_score = 1.0 - cataract_score
+            # Healthy clear eye: dark pupil (mean brightness < 75) AND strong dark ratio (> 0.20)
+            elif mb < 75 and dr > 0.20:
+                normal_score = 0.96
+                cataract_score = 0.04
             else:
-                # Low-medium brightness (75-90): lean normal
-                normal_score = 0.72
-                cataract_score = 0.28
+                # Borderline — use model prediction
+                cataract_score = model_cataract_score
+                normal_score = 1.0 - cataract_score
 
         if cataract_score >= 0.5:
             result_title = "Cataract Cloudiness Detected"

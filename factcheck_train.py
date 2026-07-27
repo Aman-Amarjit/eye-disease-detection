@@ -108,9 +108,13 @@ def run_factchecked_training():
     # FACT CHECK 4: TRAINING & GRADIENT CONVERGENCE MONITORING
     # -------------------------------------------------------------------------
     print("\n[FACT CHECK 4/6] ⚡ Training & Gradient Convergence (12 Epochs)")
-    criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.AdamW(model.backbone.classifier.parameters(), lr=0.001, weight_decay=1e-4)
-    epochs = 12
+    # Calculate class weights for 300 normal : 100 cataract (3:1 imbalance)
+    pos_weight = torch.tensor([3.0]).to(device)
+    criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+    
+    # Train classifier head first (epochs 1-6), then unfreeze top backbone features for fine-tuning
+    optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=1e-4)
+    epochs = 14
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
     history = {'train_loss': [], 'train_acc': [], 'val_loss': [], 'val_acc': []}
     best_acc = 0.0
@@ -131,23 +135,25 @@ def run_factchecked_training():
 
             for inputs, labels in dataloaders[phase]:
                 inputs = inputs.to(device)
-                labels = labels.to(device).float().unsqueeze(1)
+                # Invert target so: 1.0 = Cataract, 0.0 = Normal (allows pos_weight=3.0 to scale Cataract loss)
+                target = (1.0 - labels.float().unsqueeze(1)).to(device)
 
                 optimizer.zero_grad()
 
                 with torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
                     preds = (torch.sigmoid(outputs) >= 0.5).float()
-                    loss = criterion(outputs, labels)
+                    loss = criterion(outputs, target)
 
                     if phase == 'train':
                         loss.backward()
                         # Gradient fact-check: Ensure gradients exist and are non-zero
-                        grad_norm = torch.nn.utils.clip_grad_norm_(model.backbone.classifier.parameters(), max_norm=10.0)
+                        grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)
                         optimizer.step()
 
+                # Statistics (matching inverted target)
                 running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data).item()
+                running_corrects += torch.sum(preds == target.data)
                 total_samples += inputs.size(0)
 
             epoch_loss = running_loss / total_samples
@@ -194,7 +200,8 @@ def run_factchecked_training():
 
             all_probs.extend(probs)
             all_preds.extend(preds)
-            all_targets.extend(labels.numpy())
+            # 1.0 - labels maps label 0 (cataract) -> 1.0 (Cataract Target)
+            all_targets.extend((1.0 - labels.numpy()).astype(int))
 
     all_preds = np.array(all_preds)
     all_targets = np.array(all_targets)
