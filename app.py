@@ -36,7 +36,7 @@ def load_ai_model():
 def validate_eye_photo(img_pil):
     """
     Validates if an uploaded image contains a human eye (fundus scan or external eye photo).
-    Rejects non-eye photos (walls, ceilings, background rooms, furniture).
+    Rejects non-eye photos (covered face/hands, skin, walls, ceilings, background rooms, furniture).
     """
     img = np.array(img_pil.convert("RGB"))
     h, w, _ = img.shape
@@ -50,21 +50,25 @@ def validate_eye_photo(img_pil):
         return True, "fundus"
 
     # 2. External Eye Check
-    ch1, ch2 = int(h * 0.30), int(h * 0.70)
-    cw1, cw2 = int(w * 0.30), int(w * 0.70)
+    ch1, ch2 = int(h * 0.25), int(h * 0.75)
+    cw1, cw2 = int(w * 0.25), int(w * 0.75)
     center_crop = gray[ch1:ch2, cw1:cw2]
 
     center_std = float(np.std(center_crop))
     center_mean = float(np.mean(center_crop))
     full_mean = float(np.mean(gray))
     mean_diff = abs(center_mean - full_mean)
-    dark_ratio = float(np.sum(center_crop < 45) / center_crop.size)
+    dark_ratio = float(np.sum(center_crop < 50) / center_crop.size)
 
     # Edge density
-    edges = cv2.Canny(center_crop, 50, 150)
+    edges = cv2.Canny(center_crop, 40, 120)
     edge_density = float(np.sum(edges > 0) / edges.size)
 
-    is_eye = (dark_ratio > 0.04) or (mean_diff > 8.0 and edge_density > 0.015) or (center_std > 22.0 and edge_density > 0.02)
+    # Rejection rule for covered face, hands, skin, wall, background
+    if dark_ratio < 0.015 and edge_density < 0.02 and center_std < 25.0:
+        return False, "covered_face_or_non_eye"
+
+    is_eye = (dark_ratio > 0.03) or (mean_diff > 7.0 and edge_density > 0.012) or (center_std > 20.0 and edge_density > 0.015)
     return is_eye, "external"
 
 def analyze_eye_type_and_opacity(img_pil):
@@ -167,7 +171,7 @@ def predict():
         img.save(buffered, format="JPEG")
         preview_b64 = "data:image/jpeg;base64," + base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-        # Validate whether photo contains a human eye (reject room/wall/background images)
+        # Validate whether photo contains a human eye (reject room/wall/background/covered face images)
         is_eye, _ = validate_eye_photo(img)
         if not is_eye:
             return jsonify({
@@ -177,7 +181,7 @@ def predict():
                 "normal_probability": 0.0,
                 "status_color": "#d97706",
                 "result_type": "uncertain",
-                "user_advice": "No human eye was detected in this photo. Please position your eye clearly in front of the camera or upload a clear eye photograph.",
+                "user_advice": "No visible human eye was detected in this photo (e.g. hand covering face, skin, or background object). Please position your eye clearly in front of the camera.",
                 "preview_b64": preview_b64
             })
 
