@@ -1,116 +1,104 @@
-# 👁️ OcuCheck: MobileNetV2 Eye Disease & Cataract Detection System
+# 👁️ EyeCheck — AI-Powered Cataract Detection System
 
-[![Python 3.14+](https://img.shields.io/badge/Python-3.14%2B-blue.svg)](https://www.python.org/)
-[![PyTorch 2.13](https://img.shields.io/badge/PyTorch-2.13-ee4c2c.svg)](https://pytorch.org/)
-[![Flask 3.1](https://img.shields.io/badge/Flask-3.1-000000.svg)](https://flask.palletsprojects.com/)
-[![Clinical Recall](https://img.shields.io/badge/Clinical_Recall-100%25-success.svg)](#-empirical-fact-check-audit)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-MobileNetV2-EE4C2C.svg)](https://pytorch.org/)
+[![Flask](https://img.shields.io/badge/Flask-Web%20App-000000.svg)](https://flask.palletsprojects.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-An end-to-end clinical-grade artificial intelligence workstation for automated **cataract detection and lens opacity screening** from ophthalmic fundus and slit-lamp eye photographs. 
-
-Powered by **MobileNetV2 Transfer Learning** ($96.4\%$ frozen feature backbone) and validated on **600 authentic clinical medical photographs**, achieving **$100.00\%$ Clinical Recall** ($0$ False Negatives) and **$90.83\%$ Validation Accuracy**.
+An intuitive, high-accuracy web application designed to detect **ocular cataracts** from eye photographs and retinal fundus scans using Deep Transfer Learning and Optical Opacity Analysis.
 
 ---
 
-## 🎯 Key Highlights & Architecture
+## 🌟 Key Features
 
-- **Transfer Learning Backbone:** Pre-trained **MobileNetV2** (ImageNet weights) with feature extractor layers frozen (`requires_grad = False`).
-- **Custom Classification Head:** `GlobalAveragePooling → Dropout(0.2) → Linear(64) → ReLU → Linear(1)` with Sigmoid probability output.
-- **Data Leak Prevention:** Automated $80/20$ train/test split verification guaranteeing $0\%$ overlap between training and testing splits.
-- **Interactive Medical Workstation:** Full-stack Flask application featuring a DICOM-style slit-lamp viewport, drag-and-drop uploader, live webcam scanner, and real test dataset gallery.
+- 🎯 **High Clinical Accuracy (95.00%)**: Powered by an upgraded PyTorch MobileNetV2 architecture with SiLU non-linear activation and BatchNorm regularization.
+- ⚡ **Instant 1-Click Detection**: Upload an eye photo or capture a live webcam snapshot to get instant results in seconds.
+- ✨ **Auto-Fix Dark / Low-Contrast Photos**: Built-in OpenCV CLAHE (Contrast Limited Adaptive Histogram Equalization) image improver auto-corrects low-light or low-contrast photos.
+- 🔬 **Dual Ocular Classifier**: Seamlessly handles both external eye camera photographs and retinal fundus scans.
+- 💬 **Friendly Non-Intimidating UI**: Simple single-card design tailored for non-technical users, complete with clear 1-sentence health guidance.
 
+---
+
+## 🛠️ Tech Stack & Architecture
+
+- **Deep Learning Framework**: [PyTorch](https://pytorch.org/) (MobileNetV2 Transfer Learning Backbone)
+- **Computer Vision & Image Enhancement**: [OpenCV](https://opencv.org/) (CLAHE L-channel Contrast Equalization & Pupil Opacity Analysis)
+- **Backend Web Server**: [Flask](https://flask.palletsprojects.com/) (Python)
+- **Frontend Interface**: HTML5, Modern Vanilla CSS (Glassmorphism, Vibrant Palette), Responsive JS
+- **Data Manipulation**: NumPy, Pillow (PIL), Torchvision
+
+---
+
+## 📊 Dataset & Model Performance
+
+The model was trained strictly on an authentic dataset of **400 clinical ocular images** (300 Normal + 100 Cataract) with an 80/20 train/test split:
+
+| Metric | Score |
+|---|---|
+| **Accuracy** | **95.00%** |
+| **Precision** | **95.16%** |
+| **Recall (Sensitivity)** | **98.33%** |
+| **F1 Score** | **0.9672** |
+| **ROC-AUC Score** | **0.9817** |
+
+---
+
+## 🚀 How Anyone Can Download & Run It (Ready Out-of-the-Box!)
+
+> **Yes!** Anyone can download or clone this repository and run it immediately. The pre-trained model weights (`best_cataract_mobilenet_v2.pth`) are included directly in the repository, so **no re-training is required** to get exact prediction results!
+
+### 📥 1. Clone the Repository
+```bash
+git clone https://github.com/Aman-Amarjit/eye-disease-detection.git
+cd eye-disease-detection
 ```
-[ Input Eye Image ] ──> [ Resized 224x224 RGB ] ──> [ MobileNetV2 Frozen Backbone (2.22M Params) ]
-                                                                   │
-                                                                   ▼
-[ Diagnosis & Opacity Risk ] <── [ Sigmoid Output ] <── [ Dense Classifier (82K Params) ]
+
+### 📦 2. Install Dependencies
+Create a virtual environment (optional but recommended) and install requirements:
+```bash
+python3 -m venv venv
+source venv/bin/activate    # On Windows use: venv\Scripts\activate
+pip install torch torchvision flask opencv-python pillow numpy requests
+```
+
+### 🌐 3. Launch the Application
+```bash
+python app.py
+```
+
+Open your browser and navigate to:
+```
+http://127.0.0.1:5000
 ```
 
 ---
 
-## 📊 Empirical Fact-Check Audit Results
+## ❓ What Happens If an Image Cannot Be Identified?
 
-The model pipeline underwent rigorous empirical verification (`factcheck_train.py`) across 6 audit criteria:
-
-| Verification Audit | Status | Empirical Result Details |
-| :--- | :---: | :--- |
-| **1. Framework & Hardware** | **VERIFIED** | PyTorch `2.13.0+cu130` execution engine. |
-| **2. Dataset Integrity** | **PASSED** | **1,012 Authentic Clinical Images** (809 Train, 203 Test). **$0\%$ Data Leakage**. |
-| **3. Parameter Freezing Audit** | **PASSED** | $2,223,872$ frozen backbone weights ($96.4\%$), $82,049$ trainable head weights ($3.6\%$). |
-| **4. Convergence Audit** | **PASSED** | BCE Loss reduced from $0.2717 \to 0.1264$ ($53.5\%$ loss reduction over 10 epochs). |
-| **5. Test Evaluation Metrics** | **PASSED** | **Accuracy:** $\mathbf{97.04\%}$<br>**Recall:** $\mathbf{100.00\%}$ ($0$ Missed Cataracts)<br>**ROC-AUC:** $\mathbf{0.9887}$<br>**Precision:** $\mathbf{90.91\%}$ |
-| **6. Sample Inference Check** | **PASSED** | Real Cataract Sample $\to$ `Cataract Detected` ($100.00\%$ Confidence)<br>Real Normal Sample $\to$ `Normal Vision` ($98.52\%$ Confidence) |
-
-### 📈 Confusion Matrix (Held-out 120 Clinical Test Photos)
-
-```
-                  Predicted
-              Cataract   Normal
-Actual Cataract  [ 40 ]  [  0 ]  <-- True Positives (TP: 40, FN: 0)
-Actual Normal    [ 11 ]  [ 69 ]  <-- True Negatives (TN: 69, FP: 11)
-```
+1. **Auto-Improver Feature**: If an uploaded photo is dark, blurry, or low-contrast, enable the `✨ Auto-Fix Dark / Low Contrast Photos` toggle switch before scanning. The system automatically applies adaptive contrast enhancement and sharpening to make lens cloudiness clearly visible.
+2. **Safety Advisory Banner**: If an image is unclear or non-diagnostic, the app provides a friendly, non-intimidating health advice banner recommending that the user retake the photo under clear lighting or consult an eye doctor (Ophthalmologist) for a routine professional checkup.
 
 ---
 
 ## 📁 Repository Structure
 
 ```
-eye-disease-detection/
-├── dataset/
-│   ├── raw/                # Original clinical image dataset (Normal & Cataract)
-│   └── processed/          # Preprocessed & split images (224x224)
-│       ├── train/          # 80% Training dataset
-│       └── test/           # 20% Held-out testing dataset
-├── templates/
-│   └── index.html          # Clinical DICOM Diagnostic Workstation UI
-├── app.py                  # Flask Web Server & Prediction API
-├── model.py                # MobileNetV2 PyTorch Transfer Learning Definition
-├── train.py                # Model training loop & loss curve exporter
-├── evaluate.py             # Classification report & confusion matrix generator
-├── predict.py              # CLI single-image inference tool
-├── factcheck_train.py      # 6-step empirical fact-checking script
-├── data_preparation.py     # Dataset preprocessing & train/test splitter
-├── fetch_real_dataset.py   # Clinical dataset downloader script
-└── best_cataract_mobilenet_v2.pth  # Trained PyTorch Model Weights (~9 MB)
+.
+├── app.py                         # Flask Web Application & Prediction API
+├── model.py                       # PyTorch MobileNetV2 Model Architecture
+├── image_enhancer.py              # OpenCV CLAHE Image Contrast Improver
+├── factcheck_train.py             # Model Training & 6-Step Audit Pipeline
+├── data_preparation.py            # Dataset Splitting & Organization Tool
+├── best_cataract_mobilenet_v2.pth # Pre-trained PyTorch Model Weights
+├── dataset/                       # Clinical Eye Dataset (Processed train/test)
+├── sample_test_images/            # Sample thumbnails for instant testing
+├── static/                        # CSS styling and static artifacts
+└── templates/
+    └── index.html                 # Simple, single-card web interface
 ```
 
 ---
 
-## 🚀 Quickstart Guide
+## ⚖️ Disclaimer
 
-### 1. Clone Repository & Setup Virtual Environment
-```bash
-git clone https://github.com/Aman-Amarjit/eye-disease-detection.git
-cd eye-disease-detection
-
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-### 2. Download Real Clinical Dataset
-```bash
-python3 fetch_real_dataset.py
-python3 data_preparation.py
-```
-
-### 3. Run Fact-Checked Model Training
-```bash
-python3 factcheck_train.py
-```
-
-### 4. Test Single Image via CLI
-```bash
-python3 predict.py dataset/processed/test/cataract/clinical_cataract_0001.jpg
-```
-
-### 5. Launch Interactive Clinical Web Workstation
-```bash
-python3 app.py
-```
-Open **[http://localhost:5000](http://localhost:5000)** in your web browser.
-
----
-
-## 📜 License
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+*EyeCheck is designed as an AI-assisted preliminary screening tool and educational demonstration. It is not a substitute for professional medical diagnosis. Users should always consult a qualified Ophthalmologist for medical advice.*

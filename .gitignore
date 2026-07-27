@@ -9,9 +9,6 @@ env/
 *.tmp
 
 # Datasets & Temp Files
-dataset/raw/
-dataset/processed/
-temp_*/
 archive.zip
 archive_extracted/
 Cataract-Dataset/
