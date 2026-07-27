@@ -33,6 +33,40 @@ def load_ai_model():
     model.to(device)
     model.eval()
 
+def validate_eye_photo(img_pil):
+    """
+    Validates if an uploaded image contains a human eye (fundus scan or external eye photo).
+    Rejects non-eye photos (walls, ceilings, background rooms, furniture).
+    """
+    img = np.array(img_pil.convert("RGB"))
+    h, w, _ = img.shape
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+    # 1. Fundus Retinal Scan check
+    corner_avg = float(np.mean([gray[0, 0], gray[0, -1], gray[-1, 0], gray[-1, -1]]))
+    red_mean = float(np.mean(img[:, :, 0]))
+    blue_mean = float(np.mean(img[:, :, 2]))
+    if (corner_avg < 30) and (red_mean > blue_mean * 1.15):
+        return True, "fundus"
+
+    # 2. External Eye Check
+    ch1, ch2 = int(h * 0.30), int(h * 0.70)
+    cw1, cw2 = int(w * 0.30), int(w * 0.70)
+    center_crop = gray[ch1:ch2, cw1:cw2]
+
+    center_std = float(np.std(center_crop))
+    center_mean = float(np.mean(center_crop))
+    full_mean = float(np.mean(gray))
+    mean_diff = abs(center_mean - full_mean)
+    dark_ratio = float(np.sum(center_crop < 45) / center_crop.size)
+
+    # Edge density
+    edges = cv2.Canny(center_crop, 50, 150)
+    edge_density = float(np.sum(edges > 0) / edges.size)
+
+    is_eye = (dark_ratio > 0.04) or (mean_diff > 8.0 and edge_density > 0.015) or (center_std > 22.0 and edge_density > 0.02)
+    return is_eye, "external"
+
 def analyze_eye_type_and_opacity(img_pil):
     """
     Analyzes whether an image is a Retinal Fundus Scan or an External Eye Photo,
@@ -132,6 +166,20 @@ def predict():
         buffered = io.BytesIO()
         img.save(buffered, format="JPEG")
         preview_b64 = "data:image/jpeg;base64," + base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+        # Validate whether photo contains a human eye (reject room/wall/background images)
+        is_eye, _ = validate_eye_photo(img)
+        if not is_eye:
+            return jsonify({
+                "diagnosis": "No Human Eye Detected",
+                "confidence": 0.0,
+                "cataract_probability": 0.0,
+                "normal_probability": 0.0,
+                "status_color": "#d97706",
+                "result_type": "uncertain",
+                "user_advice": "No human eye was detected in this photo. Please position your eye clearly in front of the camera or upload a clear eye photograph.",
+                "preview_b64": preview_b64
+            })
 
         # Perform eye type and lens opacity analysis
         analysis = analyze_eye_type_and_opacity(img)
