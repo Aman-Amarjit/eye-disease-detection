@@ -12,6 +12,10 @@ env/
 dataset/raw/
 dataset/processed/
 temp_*/
+archive.zip
+archive_extracted/
+Cataract-Dataset/
+extracted_repo_1/
 *.zip
 *.tar.gz
 .cache/

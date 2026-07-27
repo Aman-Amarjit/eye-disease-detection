@@ -76,7 +76,10 @@ def split_and_preprocess_dataset(base_dir="dataset", train_ratio=0.8, img_size=(
     
     print("\n🔄 Processing & Splitting Dataset (80% Train / 20% Test)...")
 
-    # Ensure target output directories exist
+    # Clear old processed directory to guarantee 0% train/test file overlap
+    if os.path.exists(processed_dir):
+        shutil.rmtree(processed_dir)
+
     for cls in classes:
         os.makedirs(os.path.join(processed_dir, "train", cls), exist_ok=True)
         os.makedirs(os.path.join(processed_dir, "test", cls), exist_ok=True)
